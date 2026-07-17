@@ -1,0 +1,6 @@
+{
+  "name": "SkillSync",
+  "description": "SkillSync is a premium peer-to-peer skill exchange platform where students, developers, designers, and creators learn and teach skills together, powered by smart match recommendations and a personal AI career mentor.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
