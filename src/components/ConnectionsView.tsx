@@ -1,11 +1,11 @@
 import { motion } from "motion/react";
 import { Check, X, Users, MessageSquare, Trash2, ArrowRight } from "lucide-react";
 import { UserProfile, Connection } from "../types";
-import { MOCK_USERS } from "../data";
 
 interface ConnectionsViewProps {
   currentUser: UserProfile;
   connections: Connection[];
+  users: UserProfile[];
   onAcceptConnection: (connId: string) => void;
   onRejectConnection: (connId: string) => void;
   onRemoveConnection: (connId: string) => void;
@@ -16,6 +16,7 @@ interface ConnectionsViewProps {
 export default function ConnectionsView({
   currentUser,
   connections,
+  users,
   onAcceptConnection,
   onRejectConnection,
   onRemoveConnection,
@@ -40,7 +41,7 @@ export default function ConnectionsView({
 
   // Helper to find peer profile based on ID
   const getPeerProfile = (peerId: string): UserProfile => {
-    return MOCK_USERS.find(u => u.id === peerId) || {
+    return users.find(u => u.id === peerId) || {
       id: peerId,
       name: "Anonymous User",
       email: "anon@skillsync.app",

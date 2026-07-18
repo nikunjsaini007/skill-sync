@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { MessageSquare, Send, CheckCheck, Smile, HelpCircle, Sparkles, Brain, Code, Zap } from "lucide-react";
 import { UserProfile, Connection, Message } from "../types";
-import { MOCK_USERS } from "../data";
 
 interface MessagesViewProps {
   currentUser: UserProfile;
   connections: Connection[];
   messages: Message[];
+  users: UserProfile[];
   activeChatPeerId: string | null;
   setActiveChatPeerId: (id: string | null) => void;
   onSendMessage: (receiverId: string, text: string) => void;
@@ -17,6 +17,7 @@ export default function MessagesView({
   currentUser,
   connections,
   messages,
+  users,
   activeChatPeerId,
   setActiveChatPeerId,
   onSendMessage
@@ -32,7 +33,7 @@ export default function MessagesView({
   );
 
   const getPeerProfile = (peerId: string): UserProfile => {
-    return MOCK_USERS.find(u => u.id === peerId) || {
+    return users.find(u => u.id === peerId) || {
       id: peerId,
       name: "Swapper Peer",
       email: "peer@skillsync.app",
@@ -91,31 +92,12 @@ export default function MessagesView({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, activeChatPeerId, isTyping]);
 
-  // Simulate an automated responsive peer message when a message is sent!
-  // This makes the app feel extremely alive and magical!
-  const triggerSimulatedResponse = (peerName: string, text: string) => {
-    setIsTyping(true);
-    setTimeout(() => {
-      setIsTyping(false);
-      const responses = [
-        `Hey! Thanks for messaging. That sounds like an awesome exchange. Are you free to sync up over Google Meet tomorrow?`,
-        `Totally agree! I can definitely walk you through the details of that. When do you usually study?`,
-        `That makes perfect sense. I'd love to review your latest code/designs and trade some ideas!`,
-        `Awesome! Let's schedule a 30-min pairing session. I'll prepare a small Figma sandbox / code repo for us.`
-      ];
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      onSendMessage(activeChatPeerId!, randomResponse);
-    }, 3000);
-  };
-
   const handleSend = () => {
     if (!inputText.trim() || !activeChatPeerId) return;
     const textToSend = inputText.trim();
     onSendMessage(activeChatPeerId, textToSend);
     setInputText("");
 
-    // Trigger simulated reply after a delay
-    triggerSimulatedResponse(activePeer?.name || "Peer", textToSend);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {

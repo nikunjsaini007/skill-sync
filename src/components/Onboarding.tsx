@@ -61,11 +61,11 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
   const [bio, setBio] = useState("");
   const [headline, setHeadline] = useState("");
 
-  // AI drafting states
+
   const [isAiLoading, setIsAiLoading] = useState(false);
   const skillGroups = ["Tech", "Design", "Business", "Creative"] as const;
 
-  // Skill presets selection logic
+
   const toggleSkillOffered = (skillName: string) => {
     if (skillsOffered.includes(skillName)) {
       setSkillsOffered(skillsOffered.filter(s => s !== skillName));
@@ -95,7 +95,7 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
     reader.readAsDataURL(file);
   };
 
-  // Syncy AI profile copywriting assistance
+
   const generateAiProfileCopy = async () => {
     if (skillsOffered.length === 0 || skillsWanted.length === 0) {
       setError("Please select at least one skill to offer and one to learn first!");
@@ -104,7 +104,7 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
     setError("");
     setIsAiLoading(true);
     try {
-      // Fetch both bio and headlines from our backend
+    
       const bioRes = await fetch("/api/ai/generate-profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -131,7 +131,7 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
       });
       const headlineData = await headlineRes.json();
       if (headlineData.text) {
-        // Strip numbering if returned in list format and grab first headline choice
+      
         const choices = headlineData.text.split("\n").map((h: string) => h.replace(/^\d+\.\s*/, "").trim());
         setHeadline(choices[0] || choices[1] || headlineData.text);
       }

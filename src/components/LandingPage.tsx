@@ -38,22 +38,17 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
             </span>
           </div>
 
-          {/* Desktop Navbar Links */}
+        
           <div className="hidden items-center gap-2 rounded-full border border-brand-border/40 bg-brand-card/40 px-2 py-2 md:flex">
             <a href="#how-it-works" className="rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-brand-primary/10 hover:text-brand-primary-hover">How it Works</a>
-            <a href="#features" className="rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-brand-primary/10 hover:text-brand-primary-hover">Features</a>
             <a href="#popular-skills" className="rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-brand-primary/10 hover:text-brand-primary-hover">Skills</a>
-            <a href="#testimonials" className="rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-brand-primary/10 hover:text-brand-primary-hover">Success Stories</a>
-            <div className="mx-1 h-5 w-px bg-brand-border/60" />
-            <button 
-              onClick={onExploreDemo}
-              className="flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-slate-400 transition-all duration-300 hover:bg-amber-500/10 hover:text-white"
-            >
-              <Zap className="h-3.5 w-3.5 text-yellow-400" /> Live Demo
-            </button>
+            <a href="#features" className="rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-brand-primary/10 hover:text-brand-primary-hover">Features</a>
+            <a href="#testimonials" className="rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-brand-primary/10 hover:text-brand-primary-hover">Sync Stories</a>
+           
+           
           </div>
 
-          {/* Call to Actions */}
+
           <div className="flex items-center gap-2">
             <button 
               id="btn-login-nav"
@@ -73,11 +68,11 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <header className="relative max-w-7xl mx-auto px-6 pt-16 pb-24 md:pt-24 md:pb-36 flex flex-col lg:flex-row items-center gap-12 z-10">
+    
+      <header className="relative max-w-7xl mx-auto px-6 pt-16 pb-24 md:pt-24 md:pb-36 flex flex-col lg:flex-row items-center gap-13 z-10">
         
-        {/* Hero Left Content */}
-        <div className="flex-1 space-y-8 text-center lg:text-left">
+      
+        <div className="flex-1 space-y-8 text-center lg:text-left mt-10">
       
 
           <motion.h1 
@@ -115,13 +110,12 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
             >
               Start Syncing Now <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
             </button>
-            <button 
+            <a href="#popular-skills"><button 
               id="btn-hero-demo"
-              onClick={onExploreDemo}
               className="w-full sm:w-auto px-8 py-4 rounded-xl font-semibold glass-panel text-slate-200 hover:text-white hover:bg-white/5 transition-all border border-brand-border flex items-center justify-center gap-2 transform active:scale-95"
             >
-              Explore Live Demo
-            </button>
+              Explore Skills
+            </button></a>
           </motion.div>
 
           {/* Social Proof Stats */}
@@ -146,7 +140,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
           </motion.div>
         </div>
 
-        {/* Hero Right Visual: The Premium Skill Sync Flow Card */}
+     
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -213,7 +207,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
         </motion.div>
       </header>
 
-      {/* How It Works Section */}
+
       <section id="how-it-works" className="py-24 bg-brand-sec-bg border-y border-brand-border/60 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(88,101,242,0.16),transparent_45%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.16),transparent_40%)]" />
         <div className="max-w-7xl mx-auto px-6 relative z-10">

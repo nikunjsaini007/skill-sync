@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 
 import { UserProfile, Connection, Message, Notification } from "./types";
-import { MOCK_USERS } from "./data";
 
 
 import LandingPage from "./components/LandingPage";
@@ -27,6 +26,8 @@ import MessagesView from "./components/MessagesView";
 import AiAssistantView from "./components/AiAssistantView";
 import ProfileView from "./components/ProfileView";
 import SettingsView from "./components/SettingsView";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, firebaseReady, createFirebaseAccount, getFirebaseProfile, subscribeToFirebaseData, saveFirebaseProfile, createFirebaseConnection, updateFirebaseConnection, removeFirebaseConnection, sendFirebaseMessage, signInWithEmailAndPassword, signOut } from "./firebase";
 
 export default function App() {
  
@@ -34,6 +35,7 @@ export default function App() {
   const CONNECTIONS_KEY = "skillsync_connections";
   const MESSAGES_KEY = "skillsync_messages";
   const NOTIFICATIONS_KEY = "skillsync_notifications";
+  const [users, setUsers] = useState<UserProfile[]>([]);
 
  
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
@@ -85,6 +87,20 @@ export default function App() {
   const [showNotificationsMenu, setShowNotificationsMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  useEffect(() => {
+    if (!firebaseReady || !auth) return;
+    return onAuthStateChanged(auth, async user => {
+      if (!user) { setCurrentUser(null); return; }
+      try { setCurrentUser(await getFirebaseProfile(user.uid, user.displayName || "SkillSyncer", user.email || "")); }
+      catch (error: any) { setAuthError(error.message); }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!firebaseReady || !currentUser) return;
+    return subscribeToFirebaseData(currentUser.id, { profile: setCurrentUser, users: setUsers, connections: setConnections, messages: setMessages });
+  }, [currentUser?.id]);
+
   // --- Effects for LocalStorage Synchronization ---
   useEffect(() => {
     if (currentUser) {
@@ -121,7 +137,7 @@ export default function App() {
   }, [connections, activeChatPeerId, currentUser]);
 
   // --- Authentication Handlers ---
-  const handleAuthSubmit = (e: React.FormEvent) => {
+  const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError("");
 
@@ -130,53 +146,11 @@ export default function App() {
       return;
     }
 
-    if (authMode === "signup") {
-      // Simulate account creation
-      const newUser: UserProfile = {
-        id: "current-user-id",
-        name: authName.trim() || "New SkillSyncer",
-        email: authEmail,
-        avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80",
-        headline: "",
-        bio: "",
-        college: "",
-        skillsOffered: [],
-        skillsWanted: [],
-        experience: "Intermediate",
-        interests: "",
-        learningGoals: "",
-        isOnboarded: false, // Triggers custom onboarding step next!
-        isPremium: false,
-        rating: 5.0,
-        reviewsCount: 0,
-        achievements: ["Early Adopter"]
-      };
-      setCurrentUser(newUser);
-      setAuthMode(null);
-    } else {
-      // Simulate standard login
-      const returningUser: UserProfile = {
-        id: "current-user-id",
-        name: "Sanjay Rao",
-        email: authEmail,
-        avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80",
-        headline: "I build web apps and want to learn UI design",
-        bio: "I am a student who enjoys building simple web products. I can explain React, TypeScript, and Node basics. I want to get better at design and make cleaner app screens.",
-        college: "IIT Delhi",
-        skillsOffered: ["React", "TypeScript", "Node.js"],
-        skillsWanted: ["Figma", "UI/UX Design"],
-        experience: "Advanced",
-        interests: "Side projects, clean interfaces, student startups",
-        learningGoals: "Create better-looking product demos.",
-        isOnboarded: true,
-        isPremium: false,
-        rating: 5.0,
-        reviewsCount: 3,
-        achievements: ["Early Adopter", "Proactive Swapper"]
-      };
-      setCurrentUser(returningUser);
-      setAuthMode(null);
-    }
+    try {
+      if (!firebaseReady || !auth) throw new Error("Firebase is not configured. Add your VITE_FIREBASE_* values to .env.");
+      const profile = authMode === "signup" ? await createFirebaseAccount(authName.trim(), authEmail.trim(), authPassword) : await signInWithEmailAndPassword(auth, authEmail.trim(), authPassword).then(credential => getFirebaseProfile(credential.user.uid, credential.user.displayName || "SkillSyncer", credential.user.email || authEmail));
+      setCurrentUser(profile); setAuthMode(null); setAuthPassword("");
+    } catch (error: any) { setAuthError(error.message || "Could not sign you in."); }
   };
 
   const handleStartDemo = () => {
@@ -203,14 +177,23 @@ export default function App() {
     setCurrentUser(demoUser);
   };
 
-  const handleOnboardingComplete = (profile: UserProfile) => {
-    // Ensure ID maps correctly
-    const finalProfile = { ...profile, id: "current-user-id" };
-    setCurrentUser(finalProfile);
-    setActiveTab("dashboard");
+  const handleOnboardingComplete = async (profile: UserProfile) => {
+    if (!firebaseReady || !auth?.currentUser) {
+      setCurrentUser({ ...profile, id: currentUser?.id || profile.id });
+      setActiveTab("dashboard");
+      return;
+    }
+    try {
+      await saveFirebaseProfile({ ...profile, id: currentUser!.id });
+      setCurrentUser({ ...profile, id: currentUser!.id });
+      setActiveTab("dashboard");
+    } catch (error: any) {
+      alert(error.message || "We couldn't save your profile. Please try again.");
+    }
   };
 
   const handleLogout = () => {
+    if (firebaseReady && auth) signOut(auth);
     setCurrentUser(null);
     setActiveTab("dashboard");
     setActiveChatPeerId(null);
@@ -219,21 +202,13 @@ export default function App() {
 
   // --- Interaction Event Handlers ---
   const handleConnectPeer = (peerId: string) => {
-    // Create new connection request in pending state
-    const newConn: Connection = {
-      id: `conn-new-${Date.now()}`,
-      senderId: "current-user-id",
-      receiverId: peerId,
-      status: "pending",
-      createdAt: new Date().toISOString()
-    };
-    setConnections(prev => [...prev, newConn]);
+    createFirebaseConnection(currentUser!.id, peerId).catch(error => alert(error.message));
 
     // Send mock notification
-    const peerName = MOCK_USERS.find(u => u.id === peerId)?.name || "Peer";
+    const peerName = users.find(u => u.id === peerId)?.name || "Peer";
     const newNot: Notification = {
       id: `not-${Date.now()}`,
-      userId: "current-user-id",
+      userId: currentUser!.id,
       type: "system",
       title: "Request Sent",
       content: `Your sync connection request has been sent to ${peerName}.`,
@@ -244,17 +219,17 @@ export default function App() {
   };
 
   const handleAcceptConnection = (connId: string) => {
-    setConnections(prev => prev.map(c => c.id === connId ? { ...c, status: "accepted" } : c));
+    updateFirebaseConnection(connId, "accepted").catch(error => alert(error.message));
     
     // Find peer details
     const conn = connections.find(c => c.id === connId);
     if (conn) {
-      const peerId = conn.senderId === "current-user-id" ? conn.receiverId : conn.senderId;
-      const peerName = MOCK_USERS.find(u => u.id === peerId)?.name || "Peer";
+      const peerId = conn.senderId === currentUser!.id ? conn.receiverId : conn.senderId;
+      const peerName = users.find(u => u.id === peerId)?.name || "Peer";
 
       const newNot: Notification = {
         id: `not-${Date.now()}`,
-        userId: "current-user-id",
+        userId: currentUser!.id,
         type: "connection_accept",
         title: "Connection Accepted!",
         content: `You are now connected with ${peerName}. Chat space is unlocked!`,
@@ -266,34 +241,25 @@ export default function App() {
   };
 
   const handleRejectConnection = (connId: string) => {
-    setConnections(prev => prev.filter(c => c.id !== connId));
+    updateFirebaseConnection(connId, "rejected").catch(error => alert(error.message));
   };
 
   const handleRemoveConnection = (connId: string) => {
     if (window.confirm("Are you sure you want to remove this swapper connection?")) {
-      setConnections(prev => prev.filter(c => c.id !== connId));
+      removeFirebaseConnection(connId).catch(error => alert(error.message));
     }
   };
 
   const handleSendMessage = (receiverId: string, text: string) => {
     const activeConn = connections.find(
       c => c.status === "accepted" && 
-      ((c.senderId === "current-user-id" && c.receiverId === receiverId) ||
-       (c.senderId === receiverId && c.receiverId === "current-user-id"))
+      ((c.senderId === currentUser!.id && c.receiverId === receiverId) ||
+       (c.senderId === receiverId && c.receiverId === currentUser!.id))
     );
 
     if (!activeConn) return;
 
-    const newMsg: Message = {
-      id: `msg-${Date.now()}`,
-      connectionId: activeConn.id,
-      senderId: "current-user-id",
-      text,
-      createdAt: new Date().toISOString(),
-      read: true
-    };
-
-    setMessages(prev => [...prev, newMsg]);
+    sendFirebaseMessage(activeConn.id, currentUser!.id, [activeConn.senderId, activeConn.receiverId], text).catch(error => alert(error.message));
   };
 
   const handleOpenChat = (peerId: string) => {
@@ -361,6 +327,7 @@ export default function App() {
           <DiscoverView
             currentUser={currentUser!}
             connections={connections}
+            users={users}
             onConnectPeer={handleConnectPeer}
             onViewPeerProfile={handleViewPeerProfile}
           />
@@ -370,6 +337,7 @@ export default function App() {
           <ConnectionsView
             currentUser={currentUser!}
             connections={connections}
+            users={users}
             onAcceptConnection={handleAcceptConnection}
             onRejectConnection={handleRejectConnection}
             onRemoveConnection={handleRemoveConnection}
@@ -383,6 +351,7 @@ export default function App() {
             currentUser={currentUser!}
             connections={connections}
             messages={messages}
+            users={users}
             activeChatPeerId={activeChatPeerId}
             setActiveChatPeerId={setActiveChatPeerId}
             onSendMessage={handleSendMessage}
@@ -417,8 +386,7 @@ export default function App() {
     }
   };
 
-  // --- ROUTER VIEW ROUTING ---
-  // 1. Landing Page
+
   if (!currentUser) {
     return (
       <div className="relative min-h-screen bg-brand-bg text-slate-100 overflow-hidden font-sans">
@@ -427,7 +395,7 @@ export default function App() {
           onExploreDemo={handleStartDemo} 
         />
 
-        {/* Floating Authentication Modal */}
+       
         {authMode && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-brand-bg/85 p-4 backdrop-blur-xl">
             <div className="relative w-full max-w-5xl overflow-hidden rounded-[2rem] border border-brand-border/70 bg-gradient-to-br from-brand-card via-brand-card/95 to-brand-sec-bg/80 shadow-[0_25px_80px_rgba(2,6,23,0.45)]">
@@ -446,24 +414,15 @@ export default function App() {
                     <Sparkles className="h-6 w-6 text-white" />
                   </div>
                   <h3 className="text-2xl font-bold font-display text-white">
-                    {authMode === "login" ? "Welcome back to SkillSync" : "Build your skill swap profile"}
+                    {authMode === "login" ? "Welcome back to SkillSync" : "Build your SkillSync profile"}
                   </h3>
                   <p className="mt-3 text-sm leading-relaxed text-slate-400">
                     {authMode === "login"
-                      ? "Jump back into your peer-to-peer learning circle with a polished profile and real connections."
-                      : "Create a profile that feels premium, expressive, and ready for meaningful exchanges."}
+                      ? "Rejoin your learning circle and keep growing together."
+                      : "Create a profile that reflects your skills and interests."}
                   </p>
 
-                  <div className="mt-8 space-y-3">
-                    <div className="rounded-2xl border border-brand-border/50 bg-brand-card/60 p-4 shadow-inner shadow-brand-primary/10">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-brand-primary-hover">3D Profile Setup</p>
-                      <p className="mt-2 text-sm text-slate-300">Add a custom photo, your college, and the skills you can teach or learn.</p>
-                    </div>
-                    <div className="rounded-2xl border border-brand-border/50 bg-brand-card/60 p-4 shadow-inner shadow-brand-secondary/10">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-brand-secondary">Fast Match Flow</p>
-                      <p className="mt-2 text-sm text-slate-300">Get connected with the right peers in a few taps and start exchanging value.</p>
-                    </div>
-                  </div>
+                
                 </div>
 
                 <div className="w-full p-8 lg:w-[58%] lg:p-10">
@@ -483,7 +442,7 @@ export default function App() {
                           type="text"
                           value={authName}
                           onChange={e => setAuthName(e.target.value)}
-                          placeholder="Aarav Rao"
+                          placeholder="Your Name"
                           className="w-full rounded-2xl border border-brand-border bg-brand-bg/70 px-4 py-2.5 text-sm text-slate-100 transition-colors placeholder:text-slate-600 focus:border-brand-primary focus:outline-none"
                         />
                       </div>
@@ -535,15 +494,6 @@ export default function App() {
                     </button>
                   </div>
 
-                  <div className="mt-6 flex items-center justify-center gap-3 border-t border-brand-border/40 pt-5">
-                    <button 
-                      type="button"
-                      onClick={handleStartDemo}
-                      className="rounded-2xl bg-brand-sec-bg px-4 py-2 text-xs font-semibold text-slate-300 transition-colors hover:text-white"
-                    >
-                      Or, Try Live Demo Bypass
-                    </button>
-                  </div>
                 </div>
               </div>
             </div>

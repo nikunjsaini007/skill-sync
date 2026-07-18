@@ -2,16 +2,17 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import { Search, SlidersHorizontal, Check, Zap, Sparkles, Star, UserCheck } from "lucide-react";
 import { UserProfile, Connection } from "../types";
-import { MOCK_USERS, calculateMatchScore } from "../data";
+import { calculateMatchScore } from "../data";
 
 interface DiscoverViewProps {
   currentUser: UserProfile;
   connections: Connection[];
+  users: UserProfile[];
   onConnectPeer: (peerId: string) => void;
   onViewPeerProfile: (peer: UserProfile) => void;
 }
 
-export default function DiscoverView({ currentUser, connections, onConnectPeer, onViewPeerProfile }: DiscoverViewProps) {
+export default function DiscoverView({ currentUser, connections, users, onConnectPeer, onViewPeerProfile }: DiscoverViewProps) {
   // Filters state
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCollege, setSelectedCollege] = useState("");
@@ -20,7 +21,7 @@ export default function DiscoverView({ currentUser, connections, onConnectPeer, 
   const [showFilters, setShowFilters] = useState(false);
 
   // Extract all unique colleges from mock data
-  const colleges = Array.from(new Set(MOCK_USERS.map(u => u.college)));
+  const colleges = Array.from(new Set(users.map(u => u.college)));
 
   // Extract some common skills for the filter dropdown
   const skillsToFilter = [
@@ -29,7 +30,7 @@ export default function DiscoverView({ currentUser, connections, onConnectPeer, 
   ];
 
   // Process matching scores and filters on the mock list
-  const filteredUsers = MOCK_USERS.map(peer => {
+  const filteredUsers = users.map(peer => {
     const { score, explanation } = calculateMatchScore(currentUser, peer);
     return {
       peer,
