@@ -4,7 +4,7 @@ import { MOCK_REVIEWS } from "../data";
 
 interface ProfileViewProps {
   currentUser: UserProfile;
-  peerProfile: UserProfile | null; // If null, displays current user's profile
+  peerProfile: UserProfile | null; 
   onBackToDiscover?: () => void;
   onConnectPeer?: (peerId: string) => void;
   connections?: any[];
@@ -18,14 +18,13 @@ export default function ProfileView({
   connections = []
 }: ProfileViewProps) {
   
-  // Decide who is being shown
   const activeUser = peerProfile || currentUser;
   const isOwnProfile = activeUser.id === currentUser.id;
 
-  // Retrieve reviews or empty array
+ 
   const reviews: Review[] = MOCK_REVIEWS[activeUser.id] || [];
 
-  // Check connection state
+  
   const existingConn = connections.find(c => 
     (c.senderId === currentUser.id && c.receiverId === activeUser.id) ||
     (c.senderId === activeUser.id && c.receiverId === currentUser.id)
@@ -34,7 +33,7 @@ export default function ProfileView({
   return (
     <div id="profile-view" className="space-y-6 p-6 max-w-4xl mx-auto font-sans pb-16">
       
-      {/* Back CTA if looking at peer */}
+     
       {!isOwnProfile && onBackToDiscover && (
         <button
           onClick={onBackToDiscover}
@@ -44,7 +43,6 @@ export default function ProfileView({
         </button>
       )}
 
-      {/* Header Profile Cover Banner Card */}
       <div className="relative bg-gradient-to-r from-brand-primary/20 via-brand-secondary/20 to-brand-accent/20 rounded-2xl border border-brand-border/60 h-40 overflow-hidden">
         {/* Glow decoration */}
         <div className="absolute inset-0 bg-grid-pattern opacity-10" />
@@ -57,7 +55,7 @@ export default function ProfileView({
         </div>
       </div>
 
-      {/* Profile avatar overlay details */}
+
       <div className="relative px-6 -mt-12 flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 border-b border-brand-border/40">
         <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
           <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-brand-bg relative shrink-0 shadow-xl bg-brand-sec-bg">
@@ -76,7 +74,7 @@ export default function ProfileView({
           </div>
         </div>
 
-        {/* Call to Connect button if looking at peer */}
+        
         {!isOwnProfile && onConnectPeer && (
           <div className="shrink-0">
             {existingConn ? (
@@ -108,13 +106,13 @@ export default function ProfileView({
         )}
       </div>
 
-      {/* Grid: Left Column Details, Right Column Reviews */}
+     
       <div className="grid md:grid-cols-3 gap-6 pt-2">
         
-        {/* Left Column (Takes 2 spans) */}
+      
         <div className="md:col-span-2 space-y-6">
           
-          {/* Bio Description */}
+       
           <div className="p-5 rounded-[1.1rem] bg-brand-card/45 border border-brand-border/50 space-y-3 soft-3d">
             <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500">About</h3>
             <p className="text-xs text-slate-300 leading-relaxed font-sans whitespace-pre-wrap">{activeUser.bio}</p>
@@ -138,7 +136,7 @@ export default function ProfileView({
             </div>
           </div>
 
-          {/* Swap Matrices Matrix */}
+        
           <div className="p-5 rounded-[1.1rem] bg-brand-card/45 border border-brand-border/50 grid grid-cols-1 sm:grid-cols-2 gap-5 soft-3d">
             {/* Offering box */}
             <div className="space-y-3">
@@ -152,7 +150,7 @@ export default function ProfileView({
               </div>
             </div>
 
-            {/* Seeking box */}
+           
             <div className="space-y-3">
               <h4 className="text-xs font-bold uppercase tracking-widest text-purple-400">Wants to Learn</h4>
               <div className="flex flex-wrap gap-1.5">
@@ -165,7 +163,7 @@ export default function ProfileView({
             </div>
           </div>
 
-          {/* Achievements / Credentials Badges */}
+         
           <div className="p-5 rounded-[1.1rem] bg-brand-card/45 border border-brand-border/50 space-y-3 soft-3d">
             <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500">Badges</h3>
             <div className="flex flex-wrap gap-3">
@@ -180,13 +178,13 @@ export default function ProfileView({
 
         </div>
 
-        {/* Right Column: Reviews & Rating stats (Takes 1 span) */}
+       
         <div className="space-y-6">
           <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400">Feedback</h3>
 
           <div className="p-5 rounded-[1.1rem] bg-brand-card/45 border border-brand-border/50 space-y-4 soft-3d">
             
-            {/* Stars rating panel */}
+           
             <div className="text-center space-y-1.5 pb-4 border-b border-brand-border/40">
               <div className="text-3xl font-extrabold font-display text-white">{activeUser.rating} ★</div>
               <div className="flex gap-0.5 justify-center text-yellow-400">
@@ -197,7 +195,7 @@ export default function ProfileView({
               <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Based on {activeUser.reviewsCount} verified swaps</p>
             </div>
 
-            {/* Reviews Feed list */}
+           
             <div className="space-y-4 max-h-80 overflow-y-auto">
               {reviews.length > 0 ? (
                 reviews.map(rev => (

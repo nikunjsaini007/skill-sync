@@ -22,12 +22,12 @@ export default function MessagesView({
   setActiveChatPeerId,
   onSendMessage
 }: MessagesViewProps) {
-  
+
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  // Active accepted connections
+
   const activeConns = connections.filter(
     c => c.status === "accepted" && (c.senderId === currentUser.id || c.receiverId === currentUser.id)
   );
@@ -54,12 +54,12 @@ export default function MessagesView({
     };
   };
 
-  // List of chat partners
+
   const chatPartners = activeConns.map(conn => {
     const peerId = conn.senderId === currentUser.id ? conn.receiverId : conn.senderId;
     const peer = getPeerProfile(peerId);
-    
-    // Find last message
+
+
     const relevantMsgs = messages.filter(
       m => m.connectionId === conn.id
     );
@@ -72,25 +72,40 @@ export default function MessagesView({
     };
   });
 
-  // Find active connection
-  const activeConn = activeChatPeerId 
+
+  const activeConn = activeChatPeerId
     ? activeConns.find(
-        c => (c.senderId === currentUser.id && c.receiverId === activeChatPeerId) ||
-             (c.senderId === activeChatPeerId && c.receiverId === currentUser.id)
-      )
+      c => (c.senderId === currentUser.id && c.receiverId === activeChatPeerId) ||
+        (c.senderId === activeChatPeerId && c.receiverId === currentUser.id)
+    )
     : null;
 
-  // Filter messages for active chat
-  const activeChatMessages = activeConn 
-    ? messages.filter(m => m.connectionId === activeConn.id)
+
+  const activeChatMessages = activeConn
+    ? messages
+      .filter(m => m.connectionId === activeConn.id)
+      .sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() -
+          new Date(b.createdAt).getTime()
+      )
     : [];
 
   const activePeer = activeChatPeerId ? getPeerProfile(activeChatPeerId) : null;
 
-  // Scroll to bottom on new messages
+
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, activeChatPeerId, isTyping]);
+    if (!activeChatPeerId) return;
+
+    const timer = setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest"
+      });
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, [activeChatMessages.length, activeChatPeerId, isTyping]);
 
   const handleSend = () => {
     if (!inputText.trim() || !activeChatPeerId) return;
@@ -104,7 +119,7 @@ export default function MessagesView({
     if (e.key === "Enter") handleSend();
   };
 
-  // Syncy Icebreakers suggestion box inside chat
+
   const presetIcebreakers = activePeer ? [
     `"Hey ${activePeer.name}, saw you're offering ${activePeer.skillsOffered[0] || "skills"}. I'd love to learn that in exchange for ${currentUser.skillsOffered[0] || "my skills"}!"`,
     `"Hi! I'm building an MVP and noticed your expertise in ${activePeer.skillsOffered[0]}. Let's sync up for a session?"`,
@@ -112,8 +127,8 @@ export default function MessagesView({
 
   return (
     <div id="messages-view" className="flex h-[calc(100vh-64px)] md:h-screen font-sans border-l border-brand-border/20">
-      
-      {/* Left Sidebar: Conversations list */}
+
+
       <div className="w-80 border-r border-brand-border/40 bg-gradient-to-b from-brand-sec-bg/70 to-brand-bg/70 flex flex-col shrink-0 rounded-r-[1.4rem]">
         <div className="p-4 border-b border-brand-border/40">
           <h2 className="text-sm font-bold text-slate-200">Conversations</h2>
@@ -129,11 +144,10 @@ export default function MessagesView({
                   key={partner.peer.id}
                   onClick={() => setActiveChatPeerId(partner.peer.id)}
                   whileHover={{ x: 2, scale: 1.01 }}
-                  className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left soft-3d ${
-                    isActive
-                      ? "bg-brand-primary/10 border border-brand-primary/20"
-                      : "hover:bg-brand-card/30"
-                  }`}
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left soft-3d ${isActive
+                    ? "bg-brand-primary/10 border border-brand-primary/20"
+                    : "hover:bg-brand-card/30"
+                    }`}
                 >
                   <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 relative border border-brand-border">
                     <img src={partner.peer.avatar} alt={partner.peer.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
@@ -172,11 +186,11 @@ export default function MessagesView({
         </div>
       </div>
 
-      {/* Right Column: Chat board */}
-      <div className="flex-1 bg-brand-bg flex flex-col justify-between">
+
+      <div className="flex-1 min-h-0 bg-brand-bg flex flex-col">
         {activePeer ? (
           <>
-            {/* Peer Header */}
+
             <div className="flex items-center justify-between border-b border-brand-border/40 bg-gradient-to-r from-brand-sec-bg/40 to-brand-bg/40 p-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden border border-brand-border relative">
@@ -194,10 +208,16 @@ export default function MessagesView({
               </div>
             </div>
 
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-4">
-              
-              {/* Introduction bubble prompt */}
+
+            <div
+              className="flex-1 overflow-y-auto p-5 space-y-4"
+              style={{
+                display: "flex",
+                flexDirection: "column"
+              }}
+            >
+
+
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-xl rounded-[1.2rem] border border-brand-border/80 bg-gradient-to-tr from-brand-card to-brand-sec-bg p-4 text-center shadow-[0_12px_35px_rgba(2,6,23,0.16)] space-y-3 soft-3d">
                 <div className="w-8 h-8 rounded-full bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center text-brand-primary-hover mx-auto">
                   <Zap className="w-4 h-4" />
@@ -206,8 +226,8 @@ export default function MessagesView({
                 <p className="text-[10px] text-slate-500 leading-relaxed">
                   Both swappers are mutually verified. Discuss scheduling, select learning milestones, or ask Syncy AI inside the chatbot to generate custom roadmaps!
                 </p>
-                
-                {/* Syncy icebreaker copy buttons */}
+
+
                 <div className="space-y-1.5 text-left pt-2 border-t border-brand-border/40">
                   <span className="text-[9px] font-bold text-brand-accent uppercase tracking-wider block">Syncy Suggested Starters</span>
                   {presetIcebreakers.map((breaker, idx) => (
@@ -222,16 +242,15 @@ export default function MessagesView({
                 </div>
               </motion.div>
 
-              {/* Render dynamic chat history */}
+
               {activeChatMessages.map(msg => {
                 const isMine = msg.senderId === currentUser.id;
                 return (
                   <div key={msg.id} className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-md p-3.5 rounded-2xl text-xs space-y-1 shadow-md ${
-                      isMine
-                        ? "bg-brand-primary text-white rounded-tr-none"
-                        : "bg-brand-card border border-brand-border text-slate-200 rounded-tl-none"
-                    }`}>
+                    <div className={`max-w-md p-3.5 rounded-2xl text-xs space-y-1 shadow-md ${isMine
+                      ? "bg-brand-primary text-white rounded-tr-none"
+                      : "bg-brand-card border border-brand-border text-slate-200 rounded-tl-none"
+                      }`}>
                       <p className="leading-relaxed whitespace-pre-wrap">{msg.text}</p>
                       <div className="flex items-center justify-end gap-1 text-[9px] opacity-60">
                         <span>
@@ -244,7 +263,7 @@ export default function MessagesView({
                 );
               })}
 
-              {/* Typing indicator bubble */}
+
               {isTyping && (
                 <div className="flex justify-start">
                   <div className="bg-brand-card border border-brand-border p-3 rounded-2xl rounded-tl-none text-xs text-slate-400 flex items-center gap-1.5 shadow-md">
@@ -259,13 +278,13 @@ export default function MessagesView({
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Message Input controls */}
+
             <div className="p-4 border-t border-brand-border/40 bg-brand-sec-bg/25">
               <div className="flex items-center gap-2 bg-brand-bg rounded-xl border border-brand-border/80 px-3.5 py-1 focus-within:border-brand-primary transition-colors">
                 <button className="text-slate-500 hover:text-slate-300 transition-colors shrink-0">
                   <Smile className="w-4.5 h-4.5" />
                 </button>
-                
+
                 <input
                   id="message-input-text"
                   type="text"

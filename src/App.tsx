@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { 
-  Sparkles, 
-  Search, 
-  Bell, 
-  Menu, 
-  X, 
-  Star, 
-  Check, 
+import {
+  Sparkles,
+  Search,
+  Bell,
+  Menu,
+  X,
+  Star,
+  Check,
   AlertCircle,
   HelpCircle,
   TrendingUp,
@@ -30,14 +30,14 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth, firebaseReady, createFirebaseAccount, getFirebaseProfile, subscribeToFirebaseData, saveFirebaseProfile, createFirebaseConnection, updateFirebaseConnection, removeFirebaseConnection, sendFirebaseMessage, signInWithEmailAndPassword, signOut } from "./firebase";
 
 export default function App() {
- 
+
   const USER_KEY = "skillsync_user";
   const CONNECTIONS_KEY = "skillsync_connections";
   const MESSAGES_KEY = "skillsync_messages";
   const NOTIFICATIONS_KEY = "skillsync_notifications";
   const [users, setUsers] = useState<UserProfile[]>([]);
 
- 
+
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
     const saved = localStorage.getItem(USER_KEY);
     return saved ? JSON.parse(saved) : null;
@@ -46,7 +46,7 @@ export default function App() {
   const [connections, setConnections] = useState<Connection[]>(() => {
     const saved = localStorage.getItem(CONNECTIONS_KEY);
     if (saved) return JSON.parse(saved);
-    
+
     return [
       { id: "conn-1", senderId: "user-2", receiverId: "current-user-id", status: "pending", createdAt: new Date().toISOString() }, // Meera Nair pending
       { id: "conn-2", senderId: "user-1", receiverId: "current-user-id", status: "accepted", createdAt: new Date().toISOString() } // Aarav Shah accepted
@@ -56,7 +56,7 @@ export default function App() {
   const [messages, setMessages] = useState<Message[]>(() => {
     const saved = localStorage.getItem(MESSAGES_KEY);
     if (saved) return JSON.parse(saved);
-   
+
     return [
       { id: "msg-1", connectionId: "conn-2", senderId: "user-1", text: "Hey! I saw your profile and we look like a good fit. I can teach React if you help me with Figma basics.", createdAt: new Date(Date.now() - 36000000).toISOString(), read: true },
       { id: "msg-2", connectionId: "conn-2", senderId: "current-user-id", text: "Perfect. I can share some simple UI ideas and we can swap notes this week.", createdAt: new Date(Date.now() - 30000000).toISOString(), read: true },
@@ -72,12 +72,12 @@ export default function App() {
     ];
   });
 
- 
+
   const [activeTab, setActiveTab] = useState<string>("dashboard");
   const [activeChatPeerId, setActiveChatPeerId] = useState<string | null>(null);
   const [activePeerProfile, setActivePeerProfile] = useState<UserProfile | null>(null);
 
-  
+
   const [authMode, setAuthMode] = useState<"login" | "signup" | null>(null);
   const [authName, setAuthName] = useState("");
   const [authEmail, setAuthEmail] = useState("");
@@ -101,7 +101,7 @@ export default function App() {
     return subscribeToFirebaseData(currentUser.id, { profile: setCurrentUser, users: setUsers, connections: setConnections, messages: setMessages });
   }, [currentUser?.id]);
 
-  // --- Effects for LocalStorage Synchronization ---
+
   useEffect(() => {
     if (currentUser) {
       localStorage.setItem(USER_KEY, JSON.stringify(currentUser));
@@ -122,13 +122,12 @@ export default function App() {
     localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(notifications));
   }, [notifications]);
 
-  // Adjust active chat peer's ID dynamically when connections are updated or removed
   useEffect(() => {
     if (activeChatPeerId) {
       const stillConnected = connections.some(
-        c => c.status === "accepted" && 
-        ((c.senderId === currentUser?.id && c.receiverId === activeChatPeerId) ||
-         (c.senderId === activeChatPeerId && c.receiverId === currentUser?.id))
+        c => c.status === "accepted" &&
+          ((c.senderId === currentUser?.id && c.receiverId === activeChatPeerId) ||
+            (c.senderId === activeChatPeerId && c.receiverId === currentUser?.id))
       );
       if (!stillConnected) {
         setActiveChatPeerId(null);
@@ -136,7 +135,7 @@ export default function App() {
     }
   }, [connections, activeChatPeerId, currentUser]);
 
-  // --- Authentication Handlers ---
+
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError("");
@@ -154,7 +153,7 @@ export default function App() {
   };
 
   const handleStartDemo = () => {
-    // Quick-load demo account instantly bypasses forms
+
     const demoUser: UserProfile = {
       id: "current-user-id",
       name: "Sanjay Rao",
@@ -200,11 +199,11 @@ export default function App() {
     setActivePeerProfile(null);
   };
 
-  // --- Interaction Event Handlers ---
+
   const handleConnectPeer = (peerId: string) => {
     createFirebaseConnection(currentUser!.id, peerId).catch(error => alert(error.message));
 
-    // Send mock notification
+
     const peerName = users.find(u => u.id === peerId)?.name || "Peer";
     const newNot: Notification = {
       id: `not-${Date.now()}`,
@@ -220,8 +219,8 @@ export default function App() {
 
   const handleAcceptConnection = (connId: string) => {
     updateFirebaseConnection(connId, "accepted").catch(error => alert(error.message));
-    
-    // Find peer details
+
+
     const conn = connections.find(c => c.id === connId);
     if (conn) {
       const peerId = conn.senderId === currentUser!.id ? conn.receiverId : conn.senderId;
@@ -252,9 +251,9 @@ export default function App() {
 
   const handleSendMessage = (receiverId: string, text: string) => {
     const activeConn = connections.find(
-      c => c.status === "accepted" && 
-      ((c.senderId === currentUser!.id && c.receiverId === receiverId) ||
-       (c.senderId === receiverId && c.receiverId === currentUser!.id))
+      c => c.status === "accepted" &&
+        ((c.senderId === currentUser!.id && c.receiverId === receiverId) ||
+          (c.senderId === receiverId && c.receiverId === currentUser!.id))
     );
 
     if (!activeConn) return;
@@ -286,8 +285,8 @@ export default function App() {
     localStorage.removeItem(CONNECTIONS_KEY);
     localStorage.removeItem(MESSAGES_KEY);
     localStorage.removeItem(NOTIFICATIONS_KEY);
-    
-    // Reset to initial
+
+
     setCurrentUser(null);
     setConnections([
       { id: "conn-1", senderId: "user-2", receiverId: "current-user-id", status: "pending", createdAt: new Date().toISOString() },
@@ -310,7 +309,7 @@ export default function App() {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   };
 
-  // --- Render Navigation Router Logic ---
+
   const renderActiveView = () => {
     switch (activeTab) {
       case "dashboard":
@@ -390,17 +389,17 @@ export default function App() {
   if (!currentUser) {
     return (
       <div className="relative min-h-screen bg-brand-bg text-slate-100 overflow-hidden font-sans">
-        <LandingPage 
-          onStartAuth={setAuthMode} 
-          onExploreDemo={handleStartDemo} 
+        <LandingPage
+          onStartAuth={setAuthMode}
+          onExploreDemo={handleStartDemo}
         />
 
-       
+
         {authMode && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-brand-bg/85 p-4 backdrop-blur-xl">
             <div className="relative w-full max-w-5xl overflow-hidden rounded-[2rem] border border-brand-border/70 bg-gradient-to-br from-brand-card via-brand-card/95 to-brand-sec-bg/80 shadow-[0_25px_80px_rgba(2,6,23,0.45)]">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(88,101,242,0.16),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.16),transparent_45%)]" />
-              <button 
+              <button
                 id="btn-close-auth"
                 onClick={() => setAuthMode(null)}
                 className="absolute right-4 top-4 z-10 rounded-full border border-brand-border/50 bg-brand-bg/60 p-2 text-slate-500 transition-colors hover:text-slate-200"
@@ -422,7 +421,7 @@ export default function App() {
                       : "Create a profile that reflects your skills and interests."}
                   </p>
 
-                
+
                 </div>
 
                 <div className="w-full p-8 lg:w-[58%] lg:p-10">
@@ -506,9 +505,9 @@ export default function App() {
   // 2. Onboarding Flow if not yet completed
   if (!currentUser.isOnboarded) {
     return (
-      <Onboarding 
-        email={currentUser.email} 
-        onComplete={handleOnboardingComplete} 
+      <Onboarding
+        email={currentUser.email}
+        onComplete={handleOnboardingComplete}
       />
     );
   }
@@ -518,10 +517,10 @@ export default function App() {
 
   return (
     <div id="dashboard-container" className="min-h-screen bg-brand-bg flex text-slate-200 overflow-hidden font-sans">
-      
+
       {/* Sleek Vertical Sidebar Panel */}
-      <Sidebar 
-        activeTab={activeTab} 
+      <Sidebar
+        activeTab={activeTab}
         setActiveTab={(tab) => {
           setActivePeerProfile(null);
           setActiveTab(tab);
@@ -533,10 +532,10 @@ export default function App() {
 
       {/* Main Content Pane wrapper */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        
+
         {/* Top Horizontal Navigation bar */}
         <header id="top-nav" className="h-16 border-b border-brand-border/40 px-6 flex items-center justify-between bg-brand-sec-bg/15 shrink-0 relative z-40">
-          
+
           {/* Mobile hamburger menu */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -545,9 +544,8 @@ export default function App() {
             <Menu className="w-5 h-5" />
           </button>
 
-          {/* Search bar helper display */}
-          <div className="hidden sm:flex items-center space-x-2 text-xs font-mono text-slate-500 bg-brand-bg/50 px-3.5 py-1.5 rounded-lg border border-brand-border/40">
-            <span>Server-side Engine Active</span>
+
+          <div className="hidden sm:flex items-center justify-center bg-brand-bg/50 px-3.5 py-1.5 rounded-lg border border-brand-border/40">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           </div>
 
@@ -560,7 +558,7 @@ export default function App() {
 
           {/* Right Top Actions Controls: Notification and Avatar */}
           <div className="flex items-center space-x-4">
-            
+
             {/* Notification Bell */}
             <div className="relative">
               <button
@@ -569,9 +567,8 @@ export default function App() {
                   setShowNotificationsMenu(!showNotificationsMenu);
                   if (!showNotificationsMenu) markNotificationsRead();
                 }}
-                className={`w-9 h-9 rounded-xl border border-brand-border/60 flex items-center justify-center hover:bg-brand-card/50 transition-all ${
-                  unreadNotifications > 0 ? "text-brand-primary" : "text-slate-400 hover:text-slate-200"
-                }`}
+                className={`w-9 h-9 rounded-xl border border-brand-border/60 flex items-center justify-center hover:bg-brand-card/50 transition-all ${unreadNotifications > 0 ? "text-brand-primary" : "text-slate-400 hover:text-slate-200"
+                  }`}
               >
                 <Bell className="w-4 h-4" />
                 {unreadNotifications > 0 && (
@@ -655,9 +652,8 @@ export default function App() {
                     setActiveTab(item.id);
                     setMobileMenuOpen(false);
                   }}
-                  className={`py-3 text-lg font-bold text-left border-b border-brand-border/40 ${
-                    activeTab === item.id ? "text-brand-primary" : "text-slate-400"
-                  }`}
+                  className={`py-3 text-lg font-bold text-left border-b border-brand-border/40 ${activeTab === item.id ? "text-brand-primary" : "text-slate-400"
+                    }`}
                 >
                   {item.label}
                 </button>

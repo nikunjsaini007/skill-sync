@@ -23,7 +23,7 @@ export default function AiAssistantView({ currentUser }: AiAssistantViewProps) {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  // Auto-scroll to bottom of AI conversation
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
@@ -31,20 +31,22 @@ export default function AiAssistantView({ currentUser }: AiAssistantViewProps) {
   const handleSend = async (customPrompt?: string) => {
     const promptToSend = customPrompt || inputText.trim();
     if (!promptToSend) return;
-    
-    // Add user message to local state
+
+
     const userMessage: ChatMessage = { role: "user", text: promptToSend };
     setMessages(prev => [...prev, userMessage]);
-    
+
     if (!customPrompt) setInputText("");
     setIsLoading(true);
 
     try {
-      // Setup payload history (convert past conversation format)
-      const historyPayload = messages.map(m => ({
-        role: m.role,
-        text: m.text
-      }));
+
+      const historyPayload = messages
+        .slice(-6)
+        .map(m => ({
+          role: m.role,
+          text: m.text
+        }));
 
       const res = await fetch("/api/ai/chat", {
         method: "POST",
@@ -52,7 +54,15 @@ export default function AiAssistantView({ currentUser }: AiAssistantViewProps) {
         body: JSON.stringify({
           message: promptToSend,
           history: historyPayload,
-          profile: currentUser
+          profile: {
+            name: currentUser.name,
+            college: currentUser.college,
+            skillsOffered: currentUser.skillsOffered,
+            skillsWanted: currentUser.skillsWanted,
+            experience: currentUser.experience,
+            interests: currentUser.interests,
+            learningGoals: currentUser.learningGoals
+          }
         })
       });
 
@@ -89,19 +99,18 @@ export default function AiAssistantView({ currentUser }: AiAssistantViewProps) {
     handleSend(prompt);
   };
 
-  // Helper to parse simple markdown bolding/bullets into HTML/JSX elements safely
   const renderFormattedText = (text: string) => {
     return text.split("\n").map((line, idx) => {
       let content: React.ReactNode = line;
-      
-      // Simple custom markdown bold parser (**text**)
+
+
       const boldRegex = /\*\*(.*?)\*\*/g;
       if (boldRegex.test(line)) {
         const parts = line.split(/\*\*/g);
         content = parts.map((part, i) => (i % 2 === 1 ? <strong key={i} className="text-brand-primary-hover font-bold">{part}</strong> : part));
       }
 
-      // Check if bullet point
+
       if (line.trim().startsWith("- ") || line.trim().startsWith("* ")) {
         return (
           <li key={idx} className="ml-5 list-disc mt-1 text-slate-300 leading-relaxed text-xs">
@@ -110,7 +119,7 @@ export default function AiAssistantView({ currentUser }: AiAssistantViewProps) {
         );
       }
 
-      // Check if numbered point
+
       if (/^\d+\.\s/.test(line.trim())) {
         return (
           <div key={idx} className="ml-2 pl-1.5 border-l-2 border-brand-primary/30 my-2 text-slate-300 text-xs leading-relaxed font-sans">
@@ -119,7 +128,7 @@ export default function AiAssistantView({ currentUser }: AiAssistantViewProps) {
         );
       }
 
-      // Check if header line
+
       if (line.trim().startsWith("###")) {
         return (
           <h5 key={idx} className="text-sm font-bold text-white font-display tracking-tight mt-4 mb-2">
@@ -135,7 +144,7 @@ export default function AiAssistantView({ currentUser }: AiAssistantViewProps) {
         );
       }
 
-      // Standard paragraph line
+
       return line.trim() ? (
         <p key={idx} className="leading-relaxed text-xs text-slate-300 mb-2 font-sans whitespace-pre-wrap">
           {content}
@@ -148,8 +157,8 @@ export default function AiAssistantView({ currentUser }: AiAssistantViewProps) {
 
   return (
     <div id="ai-assistant-view" className="flex flex-col h-[calc(100vh-64px)] md:h-screen font-sans">
-      
-      {/* Top Banner Header */}
+
+
       <div className="p-4 border-b border-brand-border/40 flex items-center justify-between shrink-0 bg-brand-sec-bg/15">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-primary to-brand-accent flex items-center justify-center shadow-lg shadow-brand-accent/10">
@@ -164,28 +173,25 @@ export default function AiAssistantView({ currentUser }: AiAssistantViewProps) {
         </div>
       </div>
 
-      {/* Main Dialogue Chat Core */}
+
       <div className="flex-1 overflow-y-auto p-5 space-y-5">
-        
-        {/* Render chat entries */}
+
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={`flex gap-3 max-w-2xl ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-              {/* Avatar indicator */}
-              <div className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-white border ${
-                msg.role === "user"
-                  ? "bg-brand-secondary/20 border-brand-secondary/30"
-                  : "bg-gradient-to-tr from-brand-primary to-brand-accent border-brand-primary/30"
-              }`}>
+
+              <div className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-white border ${msg.role === "user"
+                ? "bg-brand-secondary/20 border-brand-secondary/30"
+                : "bg-gradient-to-tr from-brand-primary to-brand-accent border-brand-primary/30"
+                }`}>
                 {msg.role === "user" ? currentUser.name[0] : <Bot className="w-4.5 h-4.5 text-white" />}
               </div>
 
-              {/* Msg Box */}
-              <div className={`p-4 rounded-2xl shadow-md ${
-                msg.role === "user"
-                  ? "bg-brand-primary text-white rounded-tr-none"
-                  : "bg-brand-card/85 border border-brand-border text-slate-200 rounded-tl-none"
-              }`}>
+
+              <div className={`p-4 rounded-2xl shadow-md ${msg.role === "user"
+                ? "bg-brand-primary text-white rounded-tr-none"
+                : "bg-brand-card/85 border border-brand-border text-slate-200 rounded-tl-none"
+                }`}>
                 {msg.role === "user" ? (
                   <p className="text-xs leading-relaxed whitespace-pre-wrap">{msg.text}</p>
                 ) : (
@@ -198,7 +204,7 @@ export default function AiAssistantView({ currentUser }: AiAssistantViewProps) {
           </div>
         ))}
 
-        {/* Loading skeleton wrapper */}
+
         {isLoading && (
           <div className="flex justify-start">
             <div className="flex gap-3 max-w-xl">
@@ -217,10 +223,10 @@ export default function AiAssistantView({ currentUser }: AiAssistantViewProps) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Bottom Sticky Action Suggestions & Inputs */}
+
       <div className="p-4 border-t border-brand-border/40 bg-brand-sec-bg/25 shrink-0">
-        
-        {/* Helper quick actions grid */}
+
+
         {messages.length < 3 && !isLoading && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
             <button
@@ -261,7 +267,7 @@ export default function AiAssistantView({ currentUser }: AiAssistantViewProps) {
           </div>
         )}
 
-        {/* Input box */}
+
         <div className="flex items-center gap-2 bg-brand-bg rounded-xl border border-brand-border/80 px-4 py-1 focus-within:border-brand-primary transition-colors">
           <input
             id="ai-prompt-input"

@@ -26,7 +26,6 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
       <div className="absolute bottom-[20%] right-[-10%] w-[60%] h-[60%] rounded-full ambient-glow-2 blur-3xl pointer-events-none" />
       <div className="absolute top-[40%] left-[30%] w-[40%] h-[40%] rounded-full ambient-glow-3 blur-3xl pointer-events-none" />
 
-      {/* Hero Header / Navbar */}
       <nav id="landing-navbar" className="fixed inset-x-0 top-0 z-50 mx-4 mt-4 rounded-full border border-brand-border/50 bg-brand-bg/70 px-4 py-3 shadow-[0_10px_40px_rgba(2,6,23,0.35)] backdrop-blur-xl md:mx-6 md:px-6">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center space-x-3">
@@ -620,13 +619,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
               >
                 Sign Up Now
               </button>
-              <button 
-                id="btn-cta-demo"
-                onClick={onExploreDemo}
-                className="w-full rounded-2xl border border-brand-border bg-brand-card/70 px-8 py-4 font-semibold text-slate-200 transition-all hover:bg-brand-sec-bg hover:text-white sm:w-auto"
-              >
-                Try Out Live Demo
-              </button>
+              
             </div>
           </div>
         </div>

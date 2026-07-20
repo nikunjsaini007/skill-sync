@@ -13,23 +13,22 @@ interface DiscoverViewProps {
 }
 
 export default function DiscoverView({ currentUser, connections, users, onConnectPeer, onViewPeerProfile }: DiscoverViewProps) {
-  // Filters state
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCollege, setSelectedCollege] = useState("");
   const [selectedSkill, setSelectedSkill] = useState("");
   const [selectedExperience, setSelectedExperience] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
-  // Extract all unique colleges from mock data
+ 
   const colleges = Array.from(new Set(users.map(u => u.college)));
 
-  // Extract some common skills for the filter dropdown
   const skillsToFilter = [
     "Python", "React", "TypeScript", "Node.js", "Figma", 
     "UI/UX Design", "Machine Learning", "Video Editing", "Flutter", "SEO Optimization"
   ];
 
-  // Process matching scores and filters on the mock list
+ 
   const filteredUsers = users.map(peer => {
     const { score, explanation } = calculateMatchScore(currentUser, peer);
     return {
@@ -39,7 +38,7 @@ export default function DiscoverView({ currentUser, connections, users, onConnec
     };
   })
   .filter(({ peer }) => {
-    // Search query matches name, headline, bio, or skills
+
     const query = searchQuery.toLowerCase();
     const matchesSearch = !query || 
       peer.name.toLowerCase().includes(query) ||
@@ -48,26 +47,26 @@ export default function DiscoverView({ currentUser, connections, users, onConnec
       peer.skillsOffered.some(s => s.toLowerCase().includes(query)) ||
       peer.skillsWanted.some(s => s.toLowerCase().includes(query));
 
-    // College filter
+
     const matchesCollege = !selectedCollege || peer.college === selectedCollege;
 
-    // Skill filter (matches either offered or wanted skills)
+   
     const matchesSkill = !selectedSkill || 
       peer.skillsOffered.some(s => s.toLowerCase() === selectedSkill.toLowerCase()) ||
       peer.skillsWanted.some(s => s.toLowerCase() === selectedSkill.toLowerCase());
 
-    // Experience filter
+   
     const matchesExperience = !selectedExperience || peer.experience === selectedExperience;
 
     return matchesSearch && matchesCollege && matchesSkill && matchesExperience;
   })
-  // Sort by compatibility score descending by default
+
   .sort((a, b) => b.score - a.score);
 
   return (
     <div id="discover-view" className="space-y-6 p-6 max-w-6xl mx-auto font-sans">
       
-      {/* Search Header and filters toggle */}
+    
       <div className="hero-panel flex flex-col gap-4 rounded-[1.6rem] p-5 md:flex-row md:items-center md:justify-between">
         <div className="w-full md:w-96 relative">
           <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -98,10 +97,10 @@ export default function DiscoverView({ currentUser, connections, users, onConnec
         </div>
       </div>
 
-      {/* Advanced Filters Panel */}
+   
       {showFilters && (
         <div className="grid grid-cols-1 gap-4 rounded-[1.4rem] border border-brand-border/50 bg-brand-card/55 p-5 shadow-inner shadow-brand-primary/5 sm:grid-cols-3 soft-3d">
-          {/* College Dropdown */}
+  
           <div className="space-y-1.5">
             <label htmlFor="filter-college" className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">College</label>
             <select
@@ -117,7 +116,7 @@ export default function DiscoverView({ currentUser, connections, users, onConnec
             </select>
           </div>
 
-          {/* Skill Dropdown */}
+       
           <div className="space-y-1.5">
             <label htmlFor="filter-skill" className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Skill Track</label>
             <select
@@ -133,7 +132,7 @@ export default function DiscoverView({ currentUser, connections, users, onConnec
             </select>
           </div>
 
-          {/* Experience level Dropdown */}
+      
           <div className="space-y-1.5">
             <label htmlFor="filter-experience" className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Experience Level</label>
             <select
@@ -152,11 +151,11 @@ export default function DiscoverView({ currentUser, connections, users, onConnec
         </div>
       )}
 
-      {/* Peer Grid list */}
+     
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredUsers.length > 0 ? (
           filteredUsers.map(({ peer, score, explanation }) => {
-            // Find existing connection if any
+         
             const existingConn = connections.find(c => 
               (c.senderId === currentUser.id && c.receiverId === peer.id) ||
               (c.senderId === peer.id && c.receiverId === currentUser.id)
@@ -171,12 +170,12 @@ export default function DiscoverView({ currentUser, connections, users, onConnec
                 whileHover={{ y: -6, scale: 1.01 }}
                 className="group relative flex h-[380px] flex-col justify-between overflow-hidden rounded-[1.4rem] border border-brand-border/60 bg-gradient-to-br from-brand-card/75 via-brand-card/60 to-brand-sec-bg/70 p-5 shadow-[0_18px_45px_rgba(2,6,23,0.2)] soft-3d"
               >
-                {/* Score badge absolute */}
+             
                 <div className="absolute top-4 right-4 bg-brand-primary/10 border border-brand-primary/30 text-brand-primary-hover px-2.5 py-1 rounded-xl text-xs font-bold font-mono">
                   {score}% Match
                 </div>
 
-                {/* Profile Top info */}
+           
                 <div>
                   <div className="flex items-center gap-3">
                     <button 
@@ -196,7 +195,7 @@ export default function DiscoverView({ currentUser, connections, users, onConnec
                     </div>
                   </div>
 
-                  {/* Rating / headline */}
+              
                   <div className="flex items-center gap-1.5 mt-3 text-xs text-yellow-400">
                     <Star className="w-3.5 h-3.5 fill-yellow-400" />
                     <span className="font-bold text-slate-300">{peer.rating}</span>
@@ -208,7 +207,7 @@ export default function DiscoverView({ currentUser, connections, users, onConnec
                   </p>
                 </div>
 
-                {/* Swap tracks list details */}
+               
                 <div className="space-y-3.5 border-t border-brand-border/40 pt-4 mt-4">
                   <div className="space-y-1">
                     <span className="text-[8px] font-bold uppercase tracking-wider text-emerald-400 block">Offers</span>
@@ -233,7 +232,7 @@ export default function DiscoverView({ currentUser, connections, users, onConnec
                   </div>
                 </div>
 
-                {/* Footer interactive button action */}
+           
                 <div className="mt-5 pt-3 border-t border-brand-border/30 flex items-center justify-between">
                   <button
                     onClick={() => onViewPeerProfile(peer)}

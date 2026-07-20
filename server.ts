@@ -2,16 +2,23 @@ import express from "express";
 import path from "path";
 import dotenv from "dotenv";
 import { createServer as createViteServer } from "vite";
-import { GoogleGenAI } from "@google/genai";
+import Groq from "groq-sdk";
 import crypto from "crypto";
 import fs from "fs";
 
 dotenv.config();
 
+console.log("Current directory:", process.cwd());
+console.log("Env files check:", fs.existsSync(".env"));
+console.log(
+  "Gemini key status:",
+  process.env.GEMINI_API_KEY ? "FOUND" : "MISSING"
+);
+
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 
-app.use(express.json());
+app.use(express.json({ limit: "2mb" }));
 
 type StoredUser = {
   id: string; name: string; email: string; passwordHash: string; avatar: string;
@@ -137,100 +144,160 @@ app.post("/api/messages", (req, res) => {
   const message: StoredMessage = { id: crypto.randomUUID(), connectionId, senderId: current.id, text: String(text).trim().slice(0, 4000), createdAt: new Date().toISOString(), read: false }; database.messages.push(message); writeDatabase(database); res.status(201).json(message);
 });
 
-// Lazy-initialized Gemini AI client
-let aiInstance: GoogleGenAI | null = null;
-function getGemini(): GoogleGenAI {
-  if (!aiInstance) {
-    const apiKey = process.env.GEMINI_API_KEY;
+let groqInstance: Groq | null = null;
+
+function getGroq() {
+
+  if (!groqInstance) {
+
+    const apiKey = process.env.GROQ_API_KEY;
+
     if (!apiKey) {
-      console.warn("WARNING: GEMINI_API_KEY is not set. AI features will fallback to simulation.");
+      throw new Error("GROQ_API_KEY missing");
     }
-    aiInstance = new GoogleGenAI({
-      apiKey: apiKey || "",
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build',
-        }
-      }
+
+    groqInstance = new Groq({
+      apiKey
     });
+
+    console.log("Groq client created");
   }
-  return aiInstance;
+
+  return groqInstance;
 }
 
-// REST API for Syncy AI Assistant
 app.post("/api/ai/chat", async (req, res) => {
+
+  console.log("🔥 GROQ CHAT ROUTE HIT");
+
   try {
+
     const { message, history, profile } = req.body;
-    
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return res.json({
-        text: `Hey! I'm Syncy, your SkillSync AI Assistant. I notice that the GEMINI_API_KEY is not currently configured, but I can still simulate a friendly response! You mentioned: "${message}". In a fully connected setup, I would analyze your profile (${profile?.name || "User"}) to recommend custom matches and learning paths!`
-      });
-    }
 
-    const ai = getGemini();
-    
-    // Construct instructions context
-    const profileContext = profile 
-      ? `User Profile:\n- Name: ${profile.name}\n- College: ${profile.college}\n- Skills Offered: ${profile.skillsOffered?.join(", ") || "None"}\n- Skills Wanted: ${profile.skillsWanted?.join(", ") || "None"}\n- Experience Level: ${profile.experience}\n- Interests: ${profile.interests || "None"}\n- Goals: ${profile.learningGoals || "None"}`
-      : "User Profile: Not yet fully completed onboarding.";
 
-    const systemInstruction = `You are Syncy, a brilliant, friendly, and supportive peer-to-peer career mentor and skill matchmaker on the SkillSync platform.
-Your goals:
-1. Help users discover the best learning roadmaps for their desired skills.
-2. Provide career advice, resume tips, and learning roadmaps.
-3. Suggest skills they could offer or learn next.
-4. Help them refine their bio or profile headlines to attract better matches.
-5. Provide match recommendations or icebreaker lines for peer exchanges.
+    const groq = getGroq();
 
-Keep your tone engaging, motivational, direct, and conversational (like a tech-startup mentor). Avoid robotic intro/outro phrases.
-Format your responses using clean Markdown structure (bullet points, bolding, simple lists).
 
-Here is the context of the user you are chatting with:
-${profileContext}`;
+    const profileContext = profile
+      ? `
+User Profile:
+Name: ${profile.name}
+Skills Offered: ${profile.skillsOffered?.join(", ")}
+Skills Wanted: ${profile.skillsWanted?.join(", ")}
+Experience: ${profile.experience}
+Goals: ${profile.learningGoals}
+`
+      :
+      "No profile available";
 
-    // Convert client-supplied history to contents structure for the SDK
-    const contents: any[] = [];
-    if (history && Array.isArray(history)) {
-      history.forEach((turn: { role: string; text: string }) => {
-        contents.push({
-          role: turn.role === "user" ? "user" : "model",
-          parts: [{ text: turn.text }]
+
+    const messages: any[] = [
+
+      {
+        role: "system",
+        content:
+          `
+You are Syncy, an AI career mentor inside SkillSync.
+
+Help users with:
+- learning roadmaps
+- resume bullets
+- career advice
+- skill recommendations
+- profile improvements
+
+Be friendly, practical and concise.
+
+${profileContext}
+`
+      }
+
+    ];
+
+
+    if (Array.isArray(history)) {
+
+      history.slice(-10).forEach((m: any) => {
+
+        messages.push({
+
+          role: m.role === "user"
+            ? "user"
+            : "assistant",
+
+          content: m.text
+
         });
+
       });
+
     }
-    
-    // Append the current message
-    contents.push({
+
+
+    messages.push({
+
       role: "user",
-      parts: [{ text: message }]
+      content: message
+
     });
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents,
-      config: {
-        systemInstruction,
+
+
+    const completion =
+      await groq.chat.completions.create({
+
+        model: "llama-3.3-70b-versatile",
+
+        messages,
+
         temperature: 0.7,
-      },
+
+        max_tokens: 1000
+
+      });
+
+
+
+    const reply =
+      completion.choices[0]?.message?.content
+      ||
+      "I couldn't generate a response.";
+
+
+
+    res.json({
+
+      text: reply
+
     });
 
-    res.json({ text: response.text });
+
   } catch (error: any) {
-    console.error("Gemini API Error in /api/ai/chat:", error);
-    res.status(500).json({ error: "Something went wrong. Let's try again in a moment!", details: error.message });
+
+    console.error(
+      "Groq Error:",
+      error
+    );
+
+
+    res.status(500).json({
+
+      error: error.message
+
+    });
+
   }
+
 });
 
-// Endpoint for Syncy to generate Profile copy (bios, headlines, or suggestions)
+
 app.post("/api/ai/generate-profile", async (req, res) => {
   try {
     const { skillsOffered, skillsWanted, experience, interests, promptType } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      // Return simulated bio/headline
+
       if (promptType === "bio") {
         return res.json({
           text: `Passionate enthusiast ready to exchange skills on SkillSync! I am eager to share my knowledge in ${skillsOffered?.join(", ") || "my fields"} and looking forward to learning ${skillsWanted?.join(", ") || "new tools"}. Let's collaborate, build projects, and grow together!`
@@ -242,7 +309,7 @@ app.post("/api/ai/generate-profile", async (req, res) => {
       }
     }
 
-    const ai = getGemini();
+    const groq = getGroq();
     let prompt = "";
     if (promptType === "bio") {
       prompt = `Generate a modern, highly compelling, human-sounding personal bio (approx 100-150 words) for a professional or student profile.
@@ -263,23 +330,38 @@ Details:
 Provide ONLY the headlines, one per line, formatted with numbers (e.g. "1. Headline").`;
     }
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: prompt,
-      config: {
-        systemInstruction: "You are a professional resume writer and copywriter specializing in tech startup branding.",
-        temperature: 0.8,
-      }
+
+
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a professional resume writer and copywriter specializing in tech startup branding."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      temperature: 0.8,
     });
 
-    res.json({ text: response.text });
+    res.json({
+      text: completion.choices[0]?.message?.content || ""
+    });
+
   } catch (error: any) {
-    console.error("Gemini API Error in /api/ai/generate-profile:", error);
-    res.status(500).json({ error: "Failed to generate copywriting options." });
+    console.error("Groq API Error in /api/ai/generate-profile:", error);
+
+    res.status(500).json({
+      error: "Failed to generate copywriting options.",
+      details: error.message
+    });
   }
 });
 
-// Configure Vite middleware in development or static hosting in production
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
     console.log("Starting server in DEVELOPMENT mode with Vite Middleware...");

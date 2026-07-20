@@ -34,7 +34,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
   return (
     <aside id="app-sidebar" className="w-64 card-shell flex flex-col justify-between p-4 shrink-0 h-screen sticky top-0 hidden md:flex backdrop-blur-md z-30 rounded-r-[1.6rem]">
       
-      {/* Branding & Premium badge */}
+    
       <div className="space-y-6">
         <div className="flex items-center space-x-3 px-2 py-3">
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-primary to-brand-accent flex items-center justify-center shadow-[0_10px_25px_rgba(88,101,242,0.25)]">
@@ -48,7 +48,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
           </div>
         </div>
 
-        {/* Current user micro card */}
+       
         <div className="p-3 rounded-[1rem] bg-brand-card/70 border border-brand-border/50 flex items-center gap-3 soft-3d">
           <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-brand-primary/30">
             <img src={currentUser.avatar} alt={currentUser.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
@@ -66,7 +66,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
           </div>
         </div>
 
-        {/* Menu List */}
+     
         <nav className="space-y-1">
           {menuItems.map(item => {
             const Icon = item.icon;
@@ -102,9 +102,9 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
         </nav>
       </div>
 
-      {/* Footer Controls */}
+     
       <div className="space-y-4">
-        {/* Premium Upgrade call to action if free */}
+        
         {!currentUser.isPremium && (
           <div className="p-3.5 rounded-[1.1rem] bg-gradient-to-br from-brand-card to-brand-bg border border-brand-primary/30 relative overflow-hidden soft-3d ambient-sheen">
             <div className="absolute top-0 right-0 w-16 h-16 bg-brand-primary/5 rounded-full filter blur-md" />

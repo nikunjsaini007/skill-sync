@@ -48,7 +48,7 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
   const [step, setStep] = useState(1);
   const [error, setError] = useState("");
 
-  // Stepper state variables
+
   const [name, setName] = useState("");
   const [college, setCollege] = useState("");
   const [customCollege, setCustomCollege] = useState("");
@@ -195,12 +195,12 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
 
   return (
     <div id="onboarding-stepper" className="min-h-screen bg-brand-bg flex items-center justify-center p-4 sm:p-6 relative font-sans">
-      {/* Background blobs */}
+  
       <div className="absolute top-1/4 left-1/4 w-[30%] h-[30%] bg-brand-primary/10 rounded-full filter blur-3xl pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-[35%] h-[35%] bg-brand-secondary/10 rounded-full filter blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-3xl rounded-[2rem] border border-brand-border/70 bg-gradient-to-br from-brand-card via-brand-card/95 to-brand-sec-bg/80 shadow-[0_25px_90px_rgba(2,6,23,0.38)] relative z-10 overflow-hidden flex flex-col md:flex-row">
-        {/* Sidebar Status Info */}
+    
         <div className="w-full md:w-52 bg-brand-sec-bg/50 border-r border-brand-border/40 p-6 flex flex-row md:flex-col justify-between md:justify-start gap-4">
           <div className="space-y-1">
             <h3 className="text-xs font-bold uppercase tracking-widest text-brand-primary-hover">Setup</h3>
@@ -235,11 +235,11 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
           </div>
         </div>
 
-        {/* Form Body */}
+       
         <div className="flex-1 p-8 flex flex-col justify-between min-h-[480px]">
           <div>
             <AnimatePresence mode="wait">
-              {/* Error Callout */}
+            
               {error && (
                 <motion.div 
                   initial={{ opacity: 0, y: -5 }}
@@ -251,7 +251,7 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
                 </motion.div>
               )}
 
-              {/* Step 1: Basic Identity */}
+             
               {step === 1 && (
                 <motion.div
                   key="step1"
@@ -265,7 +265,7 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
                     <p className="text-xs text-slate-400">Tell us who you are and select an avatar representation.</p>
                   </div>
 
-                  {/* Avatar Picker */}
+                
                   <div className="space-y-2.5">
                     <label className="text-xs font-semibold text-slate-300">Choose Profile Picture</label>
                     <div className="flex flex-wrap gap-3">
@@ -296,7 +296,7 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
                     </div>
                   </div>
 
-                  {/* Name field */}
+               
                   <div className="space-y-1.5">
                     <label htmlFor="input-name" className="text-xs font-semibold text-slate-300">Full Name</label>
                     <input
@@ -309,7 +309,7 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
                     />
                   </div>
 
-                  {/* College Picker */}
+                 
                   <div className="space-y-1.5">
                     <label htmlFor="select-college" className="text-xs font-semibold text-slate-300">Your College / Institution</label>
                     <select
@@ -326,7 +326,7 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
                     </select>
                   </div>
 
-                  {/* Custom College field if selected Other */}
+          
                   {college === "Other" && (
                     <motion.div 
                       initial={{ opacity: 0, height: 0 }}
@@ -347,7 +347,7 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
                 </motion.div>
               )}
 
-              {/* Step 2: Skills Configuration */}
+           
               {step === 2 && (
                 <motion.div
                   key="step2"
@@ -361,7 +361,7 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
                     <p className="text-xs text-slate-400">Specify what you can teach and what you want to learn.</p>
                   </div>
 
-                  {/* Skills Offered */}
+                 
                   <div className="space-y-2.5">
                     <label className="text-xs font-semibold text-emerald-400">Skills Offered (Skills you can teach)</label>
                     <div className="max-h-56 space-y-3 overflow-y-auto rounded-2xl border border-brand-border/40 bg-brand-bg/50 p-2.5">
@@ -394,7 +394,7 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
                     </div>
                   </div>
 
-                  {/* Skills Wanted */}
+                 
                   <div className="space-y-2.5">
                     <label className="text-xs font-semibold text-purple-400">Skills Wanted (Skills you want to learn)</label>
                     <div className="max-h-56 space-y-3 overflow-y-auto rounded-2xl border border-brand-border/40 bg-brand-bg/50 p-2.5">
@@ -427,7 +427,7 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
                     </div>
                   </div>
 
-                  {/* Experience Level */}
+                 
                   <div className="space-y-2">
                     <label className="text-xs font-semibold text-slate-300">Your Average Experience Level</label>
                     <div className="grid grid-cols-4 gap-2">
@@ -449,7 +449,7 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
                 </motion.div>
               )}
 
-              {/* Step 3: Launch Copy (Bio & Headline) */}
+             
               {step === 3 && (
                 <motion.div
                   key="step3"
@@ -464,7 +464,7 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
                       <p className="text-xs text-slate-400">Describe yourself or let Syncy draft it for you.</p>
                     </div>
                     
-                    {/* Gemini AI helper button */}
+                  
                     <button
                       type="button"
                       onClick={generateAiProfileCopy}
@@ -480,7 +480,7 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
                     </button>
                   </div>
 
-                  {/* Headline */}
+                
                   <div className="space-y-1.5">
                     <label htmlFor="input-headline" className="text-xs font-semibold text-slate-300 flex justify-between">
                       <span>One-liner Profile Headline</span>
@@ -497,7 +497,7 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
                     />
                   </div>
 
-                  {/* Bio */}
+                  
                   <div className="space-y-1.5">
                     <label htmlFor="textarea-bio" className="text-xs font-semibold text-slate-300">A short bio describing your swap interest</label>
                     <textarea
@@ -510,7 +510,7 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
                     />
                   </div>
 
-                  {/* Optional fields: Interests & Goals */}
+                
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <label htmlFor="input-interests" className="text-[11px] font-semibold text-slate-400">Interests / Passion</label>
@@ -540,7 +540,7 @@ export default function Onboarding({ email, onComplete }: OnboardingProps) {
             </AnimatePresence>
           </div>
 
-          {/* Controls */}
+         
           <div className="flex items-center justify-between pt-6 mt-6 border-t border-brand-border/30">
             <button
               type="button"

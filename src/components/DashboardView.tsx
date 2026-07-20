@@ -22,7 +22,7 @@ interface DashboardViewProps {
 }
 
 export default function DashboardView({ currentUser, connections, onNavigateTab, onConnectPeer }: DashboardViewProps) {
-  // Find top recommended matches for the current user
+
   const matches = MOCK_USERS.map(peer => {
     const matchAnalysis = calculateMatchScore(currentUser, peer);
     return {
@@ -34,14 +34,14 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
   .sort((a, b) => b.score - a.score)
   .slice(0, 3); // Get top 3 matches
 
-  // Count active vs pending connections
+  
   const activeConnections = connections.filter(c => c.status === "accepted").length;
   const pendingRequests = connections.filter(c => c.status === "pending" && c.receiverId === currentUser.id).length;
 
   return (
     <div id="dashboard-view" className="space-y-8 p-6 max-w-6xl mx-auto font-sans">
       
-      {/* Top Welcome / Header Widget */}
+     
       <div className="hero-panel flex flex-col md:flex-row items-start md:items-center justify-between gap-4 rounded-[1.8rem] p-6">
         <div>
           <h1 className="text-3xl font-bold font-display text-white">
@@ -61,9 +61,9 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
         </div>
       </div>
 
-      {/* Grid of Key Analytical Metrics */}
+  
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Metric 1 */}
+       
         <div className="p-5 rounded-2xl bg-brand-card/45 border border-brand-border/50 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Matches Found</span>
@@ -79,7 +79,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
           </div>
         </div>
 
-        {/* Metric 2 */}
+      
         <div className="p-5 rounded-2xl bg-brand-card/45 border border-brand-border/50 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active Swaps</span>
@@ -95,7 +95,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
           </div>
         </div>
 
-        {/* Metric 3 */}
+    
         <div className="p-5 rounded-2xl bg-brand-card/45 border border-brand-border/50 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pending Requests</span>
@@ -111,7 +111,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
           </div>
         </div>
 
-        {/* Metric 4 */}
+        
         <div className="p-5 rounded-2xl bg-brand-card/45 border border-brand-border/50 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Trust Rating</span>
@@ -128,10 +128,9 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
         </div>
       </div>
 
-      {/* Main Dashboard Layout Split: Left recommendations, Right details */}
       <div className="grid lg:grid-cols-3 gap-8">
         
-        {/* Left column: Recommended Peers (Takes 2 grid spans) */}
+       
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-bold font-display text-white flex items-center gap-2">
@@ -147,7 +146,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
 
           <div className="space-y-4">
             {matches.map(({ peer, score, explanation }) => {
-              // Check if currently connected
+            
               const isConnected = connections.some(c => 
                 (c.senderId === currentUser.id && c.receiverId === peer.id) ||
                 (c.senderId === peer.id && c.receiverId === currentUser.id)
@@ -162,10 +161,10 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
                   whileHover={{ y: -6, scale: 1.01 }}
                   className="group relative flex flex-col justify-between gap-5 overflow-hidden rounded-[1.4rem] border border-brand-border/50 bg-gradient-to-br from-brand-card/75 via-brand-card/60 to-brand-sec-bg/70 p-5 shadow-[0_18px_45px_rgba(2,6,23,0.2)] md:flex-row md:items-center soft-3d"
                 >
-                  {/* Backdrop light */}
+                 
                   <div className="absolute top-0 right-0 w-24 h-24 bg-brand-primary/5 rounded-full filter blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
 
-                  {/* Profile Summary */}
+                 
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-full overflow-hidden border border-brand-primary/30 shrink-0">
                       <img src={peer.avatar} alt={peer.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
@@ -177,7 +176,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
                       </div>
                       <p className="text-xs text-slate-400 line-clamp-1 italic">"{peer.headline}"</p>
                       
-                      {/* Skill tags swapping micro-view */}
+                     
                       <div className="flex items-center gap-3 text-[10px] mt-1.5 flex-wrap">
                         <span className="text-emerald-400 font-semibold bg-emerald-500/5 px-2 py-0.5 rounded border border-emerald-500/10">
                           Teaches: {peer.skillsOffered.slice(0, 2).join(", ")}
@@ -189,7 +188,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
                     </div>
                   </div>
 
-                  {/* Compatibility score & action */}
+                 
                   <div className="flex md:flex-col items-center md:items-end justify-between md:justify-center gap-4 border-t border-brand-border/40 md:border-0 pt-3 md:pt-0 shrink-0">
                     <div className="text-right">
                       <div className="text-lg font-bold font-mono text-brand-primary-hover flex items-center gap-1 justify-end leading-none">
@@ -219,7 +218,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
           </div>
         </div>
 
-        {/* Right column: Quick controls, Learning progress (Takes 1 grid span) */}
+      
         <div className="space-y-6">
           <h3 className="text-lg font-bold font-display text-white flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-brand-secondary" /> Swap Goals & Actions
@@ -227,7 +226,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
 
           <div className="space-y-6 rounded-[1.4rem] border border-brand-border/50 bg-gradient-to-br from-brand-card/70 via-brand-card/60 to-brand-sec-bg/70 p-6 shadow-[0_16px_40px_rgba(2,6,23,0.2)] soft-3d">
             
-            {/* Learning Goals Micro Card */}
+           
             <div className="space-y-2.5">
               <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Active Swap Track</h4>
               <div className="p-3.5 rounded-[1rem] bg-brand-bg/50 border border-brand-border flex items-center justify-between glow-chip">
@@ -241,7 +240,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
               </div>
             </div>
 
-            {/* Upcoming Sessions Widget */}
+          
             <div className="space-y-3">
               <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Upcoming Session Swaps</h4>
               
@@ -268,7 +267,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
               </div>
             </div>
 
-            {/* AI Advisor Shortcut CTA */}
+       
             <div className="p-4 rounded-[1rem] bg-gradient-to-tr from-brand-primary/10 to-brand-accent/10 border border-brand-primary/30 relative overflow-hidden group soft-3d ambient-sheen">
               <h5 className="text-xs font-bold text-slate-200 flex items-center gap-1">
                 <Sparkles className="w-4 h-4 text-brand-accent" /> Need Swap Icebreakers?

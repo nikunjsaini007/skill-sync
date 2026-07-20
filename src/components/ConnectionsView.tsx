@@ -24,22 +24,21 @@ export default function ConnectionsView({
   onViewProfile
 }: ConnectionsViewProps) {
   
-  // Pending connection requests incoming (where receiver is the current user)
   const pendingIncoming = connections.filter(
     c => c.status === "pending" && c.receiverId === currentUser.id
   );
 
-  // Pending connection requests outgoing (where sender is current user)
+
   const pendingOutgoing = connections.filter(
     c => c.status === "pending" && c.senderId === currentUser.id
   );
 
-  // Accepted connections
+  
   const activeConnections = connections.filter(
     c => c.status === "accepted" && (c.senderId === currentUser.id || c.receiverId === currentUser.id)
   );
 
-  // Helper to find peer profile based on ID
+ 
   const getPeerProfile = (peerId: string): UserProfile => {
     return users.find(u => u.id === peerId) || {
       id: peerId,
@@ -65,7 +64,7 @@ export default function ConnectionsView({
   return (
     <div id="connections-view" className="space-y-8 p-6 max-w-6xl mx-auto font-sans">
       
-      {/* Header */}
+     
       <div className="hero-panel rounded-[1.6rem] p-6">
         <h1 className="text-2xl font-bold font-display text-white flex items-center gap-2">
           <Users className="w-6 h-6 text-brand-primary" /> My Exchange Network
@@ -73,14 +72,14 @@ export default function ConnectionsView({
         <p className="text-xs text-slate-400 mt-1">Keep your learning circle simple and useful.</p>
       </div>
 
-      {/* Grid: Left holds pending, Right holds active */}
+     
       <div className="grid lg:grid-cols-3 gap-8">
         
-        {/* Left Column: Pending incoming/outgoing (Takes 1 grid span) */}
+       
         <div className="space-y-6 lg:col-span-1">
           <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400">Swap Requests Pending</h3>
           
-          {/* Incoming requests list */}
+        
           <div className="space-y-4">
             <h4 className="text-xs font-semibold text-brand-primary-hover">Incoming Approvals ({pendingIncoming.length})</h4>
             
@@ -135,7 +134,7 @@ export default function ConnectionsView({
             )}
           </div>
 
-          {/* Outgoing Requests list */}
+         
           <div className="space-y-4 pt-4 border-t border-brand-border/30">
             <h4 className="text-xs font-semibold text-slate-500">Sent Requests Awaiting Response ({pendingOutgoing.length})</h4>
             
@@ -168,7 +167,7 @@ export default function ConnectionsView({
 
         </div>
 
-        {/* Right Column: Active connected swappers (Takes 2 grid spans) */}
+    
         <div className="space-y-6 lg:col-span-2">
           <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400">Active Swappers & Sessions</h3>
 

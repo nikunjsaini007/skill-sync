@@ -13,7 +13,7 @@ export default function SettingsView({ currentUser, onUpdatePlan, onResetData, o
   const [successMsg, setSuccessMsg] = useState("");
   const [privacyMode, setPrivacyMode] = useState(true);
   const [emailAlerts, setEmailAlerts] = useState(true);
-  const [themeMode, setThemeMode] = useState("dark"); // Locked beautiful Dark Cosmic theme by default
+  const [themeMode, setThemeMode] = useState("dark"); 
 
   const handleTogglePremium = () => {
     setSuccessMsg("");
@@ -36,7 +36,7 @@ export default function SettingsView({ currentUser, onUpdatePlan, onResetData, o
   return (
     <div id="settings-view" className="space-y-6 p-6 max-w-3xl mx-auto font-sans pb-16">
       
-      {/* Header */}
+    
       <div className="hero-panel rounded-[1.4rem] p-6">
         <h1 className="text-2xl font-bold font-display text-white flex items-center gap-2">
           <Settings className="w-6 h-6 text-brand-primary" /> Settings
@@ -44,7 +44,6 @@ export default function SettingsView({ currentUser, onUpdatePlan, onResetData, o
         <p className="text-xs text-slate-400 mt-1">Control your preferences and keep the workspace simple.</p>
       </div>
 
-      {/* Alert Banner */}
       {successMsg && (
         <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-xs flex items-center gap-2.5 animate-bounce">
           <Check className="w-4 h-4 shrink-0" />
@@ -52,7 +51,7 @@ export default function SettingsView({ currentUser, onUpdatePlan, onResetData, o
         </div>
       )}
 
-      {/* 1. Premium Membership Subscription Box */}
+    
       <div className="p-6 rounded-[1.2rem] bg-gradient-to-tr from-brand-card to-brand-sec-bg border border-brand-border/80 relative overflow-hidden soft-3d">
         {/* Glow decoration */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary/10 rounded-full filter blur-xl" />
@@ -87,7 +86,7 @@ export default function SettingsView({ currentUser, onUpdatePlan, onResetData, o
         </div>
       </div>
 
-      {/* Grid Settings details */}
+     
       <div className="grid sm:grid-cols-2 gap-6">
         
         {/* Workspace controls */}
@@ -96,7 +95,6 @@ export default function SettingsView({ currentUser, onUpdatePlan, onResetData, o
             <Sliders className="w-4 h-4" /> Workspace Preferences
           </h4>
 
-          {/* Theme select */}
           <div className="space-y-2">
             <label className="text-[11px] font-semibold text-slate-400">Interface Theme</label>
             <div className="grid grid-cols-2 gap-2">
@@ -119,7 +117,7 @@ export default function SettingsView({ currentUser, onUpdatePlan, onResetData, o
             </div>
           </div>
 
-          {/* Privacy alerts toggles */}
+        
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between text-xs">
               <div>
@@ -149,7 +147,7 @@ export default function SettingsView({ currentUser, onUpdatePlan, onResetData, o
           </div>
         </div>
 
-        {/* Security & Danger zone panel */}
+       
         <div className="p-5 rounded-[1.1rem] bg-brand-card/45 border border-brand-border/50 space-y-4 flex flex-col justify-between soft-3d">
           <div className="space-y-4">
             <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
