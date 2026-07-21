@@ -65,5 +65,5 @@ export interface Notification {
 export interface SkillItem {
   name: string;
   category: "Tech" | "Design" | "Business" | "Creative" | "Other";
-  popularity: number; // 1-5 scale
+  popularity: number; 
 }

@@ -166,9 +166,9 @@ export default function AiAssistantView({ currentUser }: AiAssistantViewProps) {
           </div>
           <div>
             <h1 className="text-sm font-bold text-slate-100 flex items-center gap-1">
-              Syncy AI Core <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[8px] px-1.5 py-0.5 rounded font-mono">LIVE</span>
+              Syncy AI <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[8px] px-1.5 py-0.5 rounded font-mono">LIVE</span>
             </h1>
-            <p className="text-[10px] text-slate-500">Gemini Powered Career & Skill Roadmap Engine</p>
+            <p className="text-[10px] text-slate-500">Your AI companion for mastering skills and building your career</p>
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import { ArrowRight, Code, Palette, Zap, MessageSquare, Award, Sparkles, Star, CheckCircle, Flame, Shield, ArrowUpRight, Check } from "lucide-react";
 import { POPULAR_SKILLS } from "../data";
+import { Link } from "react-router-dom";
 
 interface LandingPageProps {
   onStartAuth: (mode: "login" | "signup") => void;
@@ -13,15 +14,21 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
 
   const categories = ["All", "Tech", "Design", "Business", "Creative"];
 
-  const filteredSkills = POPULAR_SKILLS.filter(skill => 
-    activeCategory === "All" || skill.category === activeCategory
-  ).slice(0, 12);
+  const [showAllSkills, setShowAllSkills] = useState(false);
 
+  const filteredSkills = POPULAR_SKILLS.filter(skill =>
+    activeCategory === "All" || skill.category === activeCategory
+  );
+
+  const visibleSkills = showAllSkills
+    ? filteredSkills
+    : filteredSkills.slice(0, 12);
+    
 
   return (
     <div id="landing-container" className="relative min-h-screen bg-brand-bg text-slate-100 overflow-hidden font-sans">
-      
-  
+
+
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full ambient-glow-1 blur-3xl pointer-events-none" />
       <div className="absolute bottom-[20%] right-[-10%] w-[60%] h-[60%] rounded-full ambient-glow-2 blur-3xl pointer-events-none" />
       <div className="absolute top-[40%] left-[30%] w-[40%] h-[40%] rounded-full ambient-glow-3 blur-3xl pointer-events-none" />
@@ -37,26 +44,26 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
             </span>
           </div>
 
-        
+
           <div className="hidden items-center gap-2 rounded-full border border-brand-border/40 bg-brand-card/40 px-2 py-2 md:flex">
             <a href="#how-it-works" className="rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-brand-primary/10 hover:text-brand-primary-hover">How it Works</a>
             <a href="#popular-skills" className="rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-brand-primary/10 hover:text-brand-primary-hover">Skills</a>
             <a href="#features" className="rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-brand-primary/10 hover:text-brand-primary-hover">Features</a>
             <a href="#testimonials" className="rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-brand-primary/10 hover:text-brand-primary-hover">Sync Stories</a>
-           
-           
+
+
           </div>
 
 
           <div className="flex items-center gap-2">
-            <button 
+            <button
               id="btn-login-nav"
               onClick={() => onStartAuth("login")}
               className="rounded-full px-4 py-2 text-sm font-medium text-slate-300 transition-colors duration-300 hover:bg-white/5 hover:text-white"
             >
               Log In
             </button>
-            <button 
+            <button
               id="btn-signup-nav"
               onClick={() => onStartAuth("signup")}
               className="flex items-center gap-2 rounded-full bg-gradient-to-r from-brand-primary to-brand-secondary px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-primary/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-brand-primary/40"
@@ -67,14 +74,14 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
         </div>
       </nav>
 
-    
-      <header className="relative max-w-7xl mx-auto px-6 pt-16 pb-24 md:pt-24 md:pb-36 flex flex-col lg:flex-row items-center gap-13 z-10">
-        
-      
-        <div className="flex-1 space-y-8 text-center lg:text-left mt-10">
-      
 
-          <motion.h1 
+      <header className="relative max-w-7xl mx-auto px-6 pt-16 pb-24 md:pt-24 md:pb-36 flex flex-col lg:flex-row items-center gap-13 z-10">
+
+
+        <div className="flex-1 space-y-8 text-center lg:text-left mt-10">
+
+
+          <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
@@ -87,7 +94,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
             </span>
           </motion.h1>
 
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -96,20 +103,20 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
             Skip the expensive courses and learn by sharing skills with real people. Give what you know, get what you need, and grow together.
           </motion.p>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
             className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
           >
-            <button 
+            <button
               id="btn-hero-signup"
               onClick={() => onStartAuth("signup")}
               className="w-full sm:w-auto px-8 py-4 rounded-xl font-bold bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary-hover hover:to-brand-accent text-white shadow-xl shadow-brand-primary/20 hover:shadow-brand-primary/40 transition-all flex items-center justify-center gap-2.5 group transform active:scale-95"
             >
               Start Syncing Now <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
             </button>
-            <a href="#popular-skills"><button 
+            <a href="#popular-skills"><button
               id="btn-hero-demo"
               className="w-full sm:w-auto px-8 py-4 rounded-xl font-semibold glass-panel text-slate-200 hover:text-white hover:bg-white/5 transition-all border border-brand-border flex items-center justify-center gap-2 transform active:scale-95"
             >
@@ -117,8 +124,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
             </button></a>
           </motion.div>
 
-          {/* Social Proof Stats */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
@@ -139,14 +145,14 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
           </motion.div>
         </div>
 
-     
-        <motion.div 
+
+        <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
           className="flex-1 relative w-full max-w-xl lg:max-w-none flex items-center justify-center"
         >
-          {/* Interactive Floating Mascot Representation "Syncy" */}
+
           <div className="absolute top-[-20px] right-4 bg-brand-card/90 glass-panel border border-brand-primary/40 px-3 py-1.5 rounded-full flex items-center gap-2 shadow-2xl animate-bounce">
             <div className="w-2 h-2 rounded-full bg-green-500 animate-ping" />
             <span className="text-[11px] font-mono font-medium text-brand-primary-hover flex items-center gap-1">
@@ -156,7 +162,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
 
           <div className="w-full bg-gradient-to-b from-brand-card to-brand-bg rounded-[2rem] border border-brand-border p-6 shadow-2xl relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-tr from-brand-primary/10 via-brand-secondary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-            
+
             <div className="flex items-center justify-between border-b border-brand-border/50 pb-4 mb-6">
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-red-500/80" />
@@ -217,8 +223,8 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 relative">
-            
-            {/* Step 1 */}
+
+
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -241,7 +247,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
               </div>
             </motion.div>
 
-            {/* Step 2 */}
+
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -264,7 +270,6 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
               </div>
             </motion.div>
 
-            {/* Step 3 */}
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -291,7 +296,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
         </div>
       </section>
 
-      {/* Popular Skills Showcase */}
+
       <section id="popular-skills" className="py-24 max-w-7xl mx-auto px-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div className="space-y-4 max-w-2xl">
@@ -300,17 +305,15 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
             <p className="text-slate-400 leading-relaxed">Explore the skills people are actively sharing right now. From design and development to growth and media, there’s always something worth swapping.</p>
           </div>
 
-          {/* Categories selectors */}
           <div className="flex flex-wrap gap-2.5">
             {categories.map(cat => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat as any)}
-                className={`rounded-full border px-4 py-2 text-sm font-medium transition-all duration-300 ${
-                  activeCategory === cat
-                    ? "border-brand-primary bg-brand-primary text-white shadow-lg shadow-brand-primary/20"
-                    : "border-brand-border/60 bg-brand-card/40 text-slate-400 hover:border-brand-primary/40 hover:text-white"
-                }`}
+                className={`rounded-full border px-4 py-2 text-sm font-medium transition-all duration-300 ${activeCategory === cat
+                  ? "border-brand-primary bg-brand-primary text-white shadow-lg shadow-brand-primary/20"
+                  : "border-brand-border/60 bg-brand-card/40 text-slate-400 hover:border-brand-primary/40 hover:text-white"
+                  }`}
               >
                 {cat}
               </button>
@@ -318,11 +321,10 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
           </div>
         </div>
 
-        {/* Skill Cards Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredSkills.map((skill, index) => (
-            <motion.div 
-              key={index}
+          {visibleSkills.map((skill, index) => (
+            <motion.div
+              key={skill.name}
               initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
@@ -331,21 +333,30 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
               className="group relative flex h-36 flex-col justify-between overflow-hidden rounded-[1.3rem] border border-brand-border/60 bg-gradient-to-br from-brand-card/80 via-brand-card/60 to-brand-sec-bg/80 p-5 shadow-[0_16px_45px_rgba(2,6,23,0.28)]"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/10 via-transparent to-brand-accent/10 opacity-0 transition-all duration-500 group-hover:opacity-100" />
+
               <div className="relative flex items-start justify-between">
                 <span className="rounded-full border border-brand-border/40 bg-brand-sec-bg/70 px-2.5 py-1 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-400">
                   {skill.category}
                 </span>
+
                 <div className="flex gap-0.5">
                   {[...Array(5)].map((_, i) => (
-                    <Star 
-                      key={i} 
-                      className={`h-3 w-3 ${i < skill.popularity ? "fill-yellow-400 text-yellow-400" : "text-slate-700"}`} 
+                    <Star
+                      key={i}
+                      className={`h-3 w-3 ${i < skill.popularity
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-slate-700"
+                        }`}
                     />
                   ))}
                 </div>
               </div>
+
               <div className="relative mt-4 flex items-end justify-between">
-                <h4 className="font-display font-bold text-slate-200 transition-colors duration-300 group-hover:text-brand-primary-hover">{skill.name}</h4>
+                <h4 className="font-display font-bold text-slate-200 transition-colors duration-300 group-hover:text-brand-primary-hover">
+                  {skill.name}
+                </h4>
+
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl border border-brand-border/60 bg-brand-sec-bg/80 text-slate-400 transition-all duration-300 group-hover:bg-brand-primary group-hover:text-white">
                   <ArrowUpRight className="h-3.5 w-3.5" />
                 </div>
@@ -353,13 +364,24 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
             </motion.div>
           ))}
         </div>
+
+        {filteredSkills.length > 12 && (
+          <div className="mt-10 flex justify-center">
+            <button
+              onClick={() => setShowAllSkills(!showAllSkills)}
+              className="rounded-full border border-brand-border bg-brand-card px-6 py-3 text-sm font-medium text-slate-300 transition hover:bg-brand-primary hover:text-white"
+            >
+              {showAllSkills ? "Show Less" : "Show More"}
+            </button>
+          </div>
+        )}
       </section>
 
-      {/* Features / Premium Services Section */}
+
       <section id="features" className="relative py-24 border-t border-brand-border/40 bg-brand-sec-bg">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(88,101,242,0.12),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.12),transparent_35%)]" />
         <div className="relative z-10 mx-auto max-w-7xl px-6">
-          
+
           <div className="mx-auto mb-20 max-w-2xl text-center space-y-4">
             <h2 className="text-xs font-bold uppercase tracking-[0.35em] text-brand-secondary">Startup Quality Features</h2>
             <h3 className="text-3xl font-bold font-display text-white md:text-4xl">Built for Real Connection</h3>
@@ -367,8 +389,8 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            
-            {/* Feature 1 */}
+
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -390,7 +412,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
               <span className="relative mt-6 inline-flex items-center gap-1 text-xs font-mono text-brand-primary-hover">98% Accuracy Engine</span>
             </motion.div>
 
-            {/* Feature 2 */}
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -412,7 +434,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
               <span className="relative mt-6 inline-flex items-center gap-1 text-xs font-mono text-brand-secondary">Gemini AI Integrated</span>
             </motion.div>
 
-            {/* Feature 3 */}
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -434,7 +456,6 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
               <span className="relative mt-6 inline-flex items-center gap-1 text-xs font-mono text-emerald-400">P2P Safe Chats</span>
             </motion.div>
 
-            {/* Feature 4 */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -456,7 +477,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
               <span className="relative mt-6 inline-flex items-center gap-1 text-xs font-mono text-red-400">3-Step Easy Flow</span>
             </motion.div>
 
-            {/* Feature 5 */}
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -478,7 +499,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
               <span className="relative mt-6 inline-flex items-center gap-1 text-xs font-mono text-amber-400">Review Framework</span>
             </motion.div>
 
-            {/* Feature 6 */}
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -504,7 +525,6 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
         </div>
       </section>
 
-      {/* Testimonials */}
       <section id="testimonials" className="mx-auto max-w-7xl px-6 py-24">
         <div className="mx-auto mb-16 max-w-2xl text-center space-y-4">
           <h2 className="text-xs font-bold uppercase tracking-[0.35em] text-brand-primary">SkillSyncer Stories</h2>
@@ -599,7 +619,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
         </div>
       </section>
 
-      {/* Call To Action Banner */}
+
       <section className="relative z-10 mx-auto max-w-7xl px-6 py-24">
         <div className="relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-brand-border/80 bg-gradient-to-r from-brand-primary/25 via-brand-secondary/15 to-brand-accent/15 p-10 text-center shadow-[0_30px_80px_rgba(2,6,23,0.35)] md:p-16">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(88,101,242,0.2),transparent_70%)]" />
@@ -612,38 +632,62 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
               Join thousands of college students, creators, and developers sharing knowledge, creating portfolios, and growing their networks together.
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <button 
+              <button
                 id="btn-cta-signup"
                 onClick={() => onStartAuth("signup")}
                 className="w-full rounded-2xl bg-gradient-to-r from-brand-primary to-brand-secondary px-8 py-4 font-bold text-white shadow-[0_18px_40px_rgba(88,101,242,0.25)] transition-all hover:scale-[1.02] hover:shadow-[0_20px_45px_rgba(88,101,242,0.35)] sm:w-auto"
               >
                 Sign Up Now
               </button>
-              
+
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-brand-border/40 bg-brand-bg/80 py-12">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-6 text-sm text-slate-500 md:flex-row">
-          <div className="flex items-center space-x-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-tr from-brand-primary to-brand-accent shadow-lg shadow-brand-primary/20">
-              <Sparkles className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-lg font-bold font-display text-slate-300">SkillSync</span>
-          </div>
-          <p className="text-center text-xs md:text-left">
-            &copy; {new Date().getFullYear()} SkillSync. All rights reserved.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400 md:justify-end">
-            <a href="#" className="transition-colors hover:text-brand-primary-hover">Privacy Policy</a>
-            <a href="#" className="transition-colors hover:text-brand-primary-hover">Terms of Service</a>
-            <a href="#" className="transition-colors hover:text-brand-primary-hover">Support Desk</a>
-          </div>
-        </div>
-      </footer>
+<footer className="relative z-10 border-t border-brand-border/40 bg-brand-bg/80 py-12">
+  <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-6 text-sm text-slate-500 md:flex-row">
+    
+    <div className="flex items-center space-x-3">
+      <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-tr from-brand-primary to-brand-accent shadow-lg shadow-brand-primary/20">
+        <Sparkles className="h-4 w-4 text-white" />
+      </div>
+
+      <span className="text-lg font-bold font-display text-slate-300">
+        SkillSync
+      </span>
+    </div>
+
+    <p className="text-center text-xs md:text-left">
+      &copy; {new Date().getFullYear()} SkillSync. All rights reserved.
+    </p>
+
+    <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400 md:justify-end">
+      <Link
+        to="/privacy-policy"
+        className="transition-colors hover:text-brand-primary-hover"
+      >
+        Privacy Policy
+      </Link>
+
+      <Link
+        to="/terms"
+        className="transition-colors hover:text-brand-primary-hover"
+      >
+        Terms of Service
+      </Link>
+
+      <Link
+        to="/support"
+        className="transition-colors hover:text-brand-primary-hover"
+      >
+        Support Desk
+      </Link>
+    </div>
+
+  </div>
+</footer>
 
     </div>
   );

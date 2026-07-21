@@ -26,7 +26,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
     { id: "discover", label: "Discover", icon: Search },
     { id: "connections", label: "Connections", icon: Users, badgeKey: "connectionsCount" },
     { id: "messages", label: "Messages", icon: MessageSquare, badgeKey: "messagesCount" },
-    { id: "ai", label: "AI Syncy", icon: Sparkles, highlight: true },
+    { id: "ai", label: "Syncy AI", icon: Sparkles, highlight: true },
     { id: "profile", label: "Profile", icon: User },
     { id: "settings", label: "Settings", icon: Settings },
   ];

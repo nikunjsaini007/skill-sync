@@ -32,7 +32,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
     };
   })
   .sort((a, b) => b.score - a.score)
-  .slice(0, 3); // Get top 3 matches
+  .slice(0, 3); 
 
   
   const activeConnections = connections.filter(c => c.status === "accepted").length;

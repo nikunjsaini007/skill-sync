@@ -12,7 +12,7 @@ import {
   TrendingUp,
   Award
 } from "lucide-react";
-
+import { Routes, Route } from "react-router-dom";
 import { UserProfile, Connection, Message, Notification } from "./types";
 
 
@@ -27,10 +27,13 @@ import AiAssistantView from "./components/AiAssistantView";
 import ProfileView from "./components/ProfileView";
 import SettingsView from "./components/SettingsView";
 import { onAuthStateChanged } from "firebase/auth";
+import Courses from "./pages/Courses";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Terms from "./pages/Terms";
 import { auth, firebaseReady, createFirebaseAccount, getFirebaseProfile, subscribeToFirebaseData, saveFirebaseProfile, createFirebaseConnection, updateFirebaseConnection, removeFirebaseConnection, sendFirebaseMessage, signInWithEmailAndPassword, signOut } from "./firebase";
 
 export default function App() {
-
+  
   const USER_KEY = "skillsync_user";
   const CONNECTIONS_KEY = "skillsync_connections";
   const MESSAGES_KEY = "skillsync_messages";
@@ -395,6 +398,8 @@ export default function App() {
         />
 
 
+
+
         {authMode && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-brand-bg/85 p-4 backdrop-blur-xl">
             <div className="relative w-full max-w-5xl overflow-hidden rounded-[2rem] border border-brand-border/70 bg-gradient-to-br from-brand-card via-brand-card/95 to-brand-sec-bg/80 shadow-[0_25px_80px_rgba(2,6,23,0.45)]">
@@ -502,7 +507,6 @@ export default function App() {
     );
   }
 
-  // 2. Onboarding Flow if not yet completed
   if (!currentUser.isOnboarded) {
     return (
       <Onboarding
@@ -512,13 +516,12 @@ export default function App() {
     );
   }
 
-  // 3. Authenticated Dashboard Container
+
   const unreadNotifications = notifications.filter(n => !n.read).length;
 
   return (
     <div id="dashboard-container" className="min-h-screen bg-brand-bg flex text-slate-200 overflow-hidden font-sans">
 
-      {/* Sleek Vertical Sidebar Panel */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={(tab) => {
@@ -530,13 +533,12 @@ export default function App() {
         onLogout={handleLogout}
       />
 
-      {/* Main Content Pane wrapper */}
+
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
 
-        {/* Top Horizontal Navigation bar */}
+
         <header id="top-nav" className="h-16 border-b border-brand-border/40 px-6 flex items-center justify-between bg-brand-sec-bg/15 shrink-0 relative z-40">
 
-          {/* Mobile hamburger menu */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden text-slate-400 hover:text-white transition-colors cursor-pointer"
@@ -545,9 +547,24 @@ export default function App() {
           </button>
 
 
-          <div className="hidden sm:flex items-center justify-center bg-brand-bg/50 px-3.5 py-1.5 rounded-lg border border-brand-border/40">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          </div>
+        <div className="hidden sm:flex items-center gap-3 justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-2 shadow-[0_0_25px_rgba(16,185,129,0.15)] backdrop-blur-md">
+  
+  <div className="relative flex h-3 w-3 items-center justify-center">
+   
+    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
+
+    
+    <span className="absolute h-4 w-4 rounded-full bg-emerald-400/30 blur-sm animate-pulse" />
+
+   
+    <span className="relative h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,1)]" />
+  </div>
+
+  <span className="text-xs font-semibold tracking-wide text-emerald-300 drop-shadow-[0_0_8px_rgba(52,211,153,0.7)]">
+    Syncy Intelligence Online
+  </span>
+
+</div>
 
           <div className="md:hidden flex items-center space-x-2">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-brand-primary to-brand-accent flex items-center justify-center">
@@ -556,10 +573,10 @@ export default function App() {
             <span className="text-base font-bold text-white font-display">SkillSync</span>
           </div>
 
-          {/* Right Top Actions Controls: Notification and Avatar */}
+
           <div className="flex items-center space-x-4">
 
-            {/* Notification Bell */}
+
             <div className="relative">
               <button
                 id="btn-bell"
@@ -578,7 +595,6 @@ export default function App() {
                 )}
               </button>
 
-              {/* Notification Popup Dropdown Menu */}
               {showNotificationsMenu && (
                 <div id="notifications-menu" className="absolute right-0 mt-2.5 w-80 rounded-2xl bg-brand-card border border-brand-border shadow-2xl p-4 space-y-3 animate-fadeIn">
                   <div className="flex items-center justify-between border-b border-brand-border/50 pb-2">
@@ -612,7 +628,7 @@ export default function App() {
               )}
             </div>
 
-            {/* User Profile Avatar click tab shortcut */}
+
             <button
               onClick={() => {
                 setActivePeerProfile(null);
@@ -625,7 +641,6 @@ export default function App() {
           </div>
         </header>
 
-        {/* Dynamic Mobile Navigation drawer menu overlay */}
         {mobileMenuOpen && (
           <div className="fixed inset-0 z-50 bg-brand-bg/95 flex flex-col p-6 space-y-6 md:hidden">
             <div className="flex items-center justify-between">
@@ -669,12 +684,14 @@ export default function App() {
           </div>
         )}
 
-        {/* Embedded Active Scroll View Router core */}
+
         <main className="flex-1 overflow-y-auto">
           {renderActiveView()}
         </main>
       </div>
 
     </div>
+    
   );
+
 }
