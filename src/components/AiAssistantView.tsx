@@ -284,7 +284,7 @@ export default function AiAssistantView({ currentUser }: AiAssistantViewProps) {
             id="btn-ai-prompt-send"
             onClick={() => handleSend()}
             disabled={isLoading || !inputText.trim()}
-            className="px-4 py-2 rounded-lg bg-gradient-to-tr from-brand-primary to-brand-accent hover:from-brand-primary-hover hover:to-brand-accent text-white font-bold text-xs disabled:opacity-30 disabled:pointer-events-none transition-all shrink-0 flex items-center gap-1"
+            className="px-4 cursor-pointer py-2 rounded-lg bg-gradient-to-tr from-brand-primary to-brand-accent hover:from-brand-primary-hover hover:to-brand-accent text-white font-bold text-xs disabled:opacity-30 disabled:pointer-events-none transition-all shrink-0 flex items-center gap-1"
           >
             Ask AI <Send className="w-3 h-3" />
           </button>

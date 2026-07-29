@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { MessageSquare, Send, CheckCheck, Smile, HelpCircle, Sparkles, Brain, Code, Zap } from "lucide-react";
 import { UserProfile, Connection, Message } from "../types";
+import { Image } from "lucide-react";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../firebase";
 
 interface MessagesViewProps {
   currentUser: UserProfile;
@@ -23,6 +26,8 @@ export default function MessagesView({
   onSendMessage
 }: MessagesViewProps) {
 
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -107,12 +112,48 @@ export default function MessagesView({
     return () => clearTimeout(timer);
   }, [activeChatMessages.length, activeChatPeerId, isTyping]);
 
-  const handleSend = () => {
+  const uploadImage = async (file: File) => {
+    if (!storage) {
+      throw new Error("Storage is not initialized");
+    }
+
+    const imageRef = ref(
+      storage,
+      `chat-images/${Date.now()}-${file.name}`
+    );
+
+    await uploadBytes(imageRef, file);
+
+    const downloadURL = await getDownloadURL(imageRef);
+
+    return downloadURL;
+  };
+
+
+
+  const handleSend = async () => {
+
+    let imageUrl = "";
+
+    if (selectedImage) {
+      imageUrl = await uploadImage(selectedImage);
+    } 
     if (!inputText.trim() || !activeChatPeerId) return;
     const textToSend = inputText.trim();
     onSendMessage(activeChatPeerId, textToSend);
     setInputText("");
 
+  };
+
+  const handleImageSelect = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    setSelectedImage(file);
+    setImagePreview(URL.createObjectURL(file));
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -278,12 +319,43 @@ export default function MessagesView({
               <div ref={messagesEndRef} />
             </div>
 
+            {selectedImage && (
+              <div className="px-4 pb-2">
+                <div className="relative inline-block">
+                  <img
+                    src={imagePreview!}
+                    alt="Preview"
+                    className="w-32 h-32 object-cover rounded-xl border border-brand-border"
+                  />
 
+                  <button
+                    onClick={() => setSelectedImage(null)}
+                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            )}
             <div className="p-4 border-t border-brand-border/40 bg-brand-sec-bg/25">
+              <input
+                id="image-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleImageSelect}
+                className="hidden"
+              />
               <div className="flex items-center gap-2 bg-brand-bg rounded-xl border border-brand-border/80 px-3.5 py-1 focus-within:border-brand-primary transition-colors">
                 <button className="text-slate-500 hover:text-slate-300 transition-colors shrink-0">
                   <Smile className="w-4.5 h-4.5" />
                 </button>
+
+                <label
+                  htmlFor="image-upload"
+                  className="cursor-pointer text-slate-500 hover:text-slate-300 transition-colors shrink-0"
+                >
+                  <Image className="w-4.5 h-4.5" />
+                </label>
 
                 <input
                   id="message-input-text"
@@ -299,7 +371,7 @@ export default function MessagesView({
                   id="btn-send-message"
                   onClick={handleSend}
                   disabled={!inputText.trim()}
-                  className="px-3.5 py-1.5 rounded-lg bg-brand-primary hover:bg-brand-primary-hover text-white disabled:opacity-30 disabled:pointer-events-none transition-colors shrink-0"
+                  className="px-3.5 py-1.5 rounded-lg bg-brand-primary hover:bg-brand-primary-hover text-white disabled:opacity-30 disabled:pointer-events-none transition-colors shrink-0 cursor-pointer"
                 >
                   <Send className="w-3.5 h-3.5" />
                 </button>

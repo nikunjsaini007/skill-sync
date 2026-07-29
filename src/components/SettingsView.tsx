@@ -169,7 +169,7 @@ export default function SettingsView({ currentUser, onUpdatePlan, onResetData, o
 
             <button
               onClick={onLogout}
-              className="w-full py-2.5 rounded-xl text-xs font-semibold hover:bg-brand-bg text-slate-500 hover:text-slate-300 transition-colors"
+              className="w-full py-2.5 rounded-xl text-xs font-semibold hover:bg-brand-bg text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
             >
               Log Out of Session
             </button>

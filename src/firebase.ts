@@ -2,6 +2,7 @@ import { initializeApp, getApps } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, deleteDoc, onSnapshot, query, where, serverTimestamp, Timestamp } from "firebase/firestore";
 import type { Connection, Message, UserProfile } from "./types";
+import { getStorage } from "firebase/storage";
 
 const config = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -13,9 +14,12 @@ const config = {
 };
 
 export const firebaseReady = Boolean(config.apiKey && config.authDomain && config.projectId && config.appId);
-const app = firebaseReady ? (getApps()[0] || initializeApp(config)) : null;
+const app = firebaseReady
+  ? (getApps()[0] || initializeApp(config))
+  : null;
 export const auth = app ? getAuth(app) : null;
 export const db = app ? getFirestore(app) : null;
+export const storage = app ? getStorage(app) : null;
 
 export const defaultProfile = (id: string, name: string, email: string): UserProfile => ({
   id, name, email,
@@ -43,7 +47,7 @@ export async function getFirebaseProfile(uid: string, fallbackName: string, emai
 }
 
 export function subscribeToFirebaseData(userId: string, callbacks: { profile: (profile: UserProfile) => void; users: (users: UserProfile[]) => void; connections: (connections: Connection[]) => void; messages: (messages: Message[]) => void }) {
-  if (!db) return () => {};
+  if (!db) return () => { };
   const stopProfile = onSnapshot(doc(db, "users", userId), snapshot => { if (snapshot.exists()) callbacks.profile(snapshot.data() as UserProfile); });
   const stopUsers = onSnapshot(query(collection(db, "users"), where("isOnboarded", "==", true)), snapshot => callbacks.users(snapshot.docs.map(item => item.data() as UserProfile).filter(user => user.id !== userId)));
   let sentConnections: Connection[] = []; let receivedConnections: Connection[] = [];

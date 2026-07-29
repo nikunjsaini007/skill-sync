@@ -218,7 +218,7 @@ export default function ConnectionsView({
                     <div className="flex items-center justify-between border-t border-brand-border/40 pt-3 mt-4">
                       <button
                         onClick={() => onRemoveConnection(conn.id)}
-                        className="text-slate-500 hover:text-red-400 transition-colors"
+                        className="text-slate-500 hover:text-red-400 transition-colors cursor-pointer"
                         title="Remove Connection"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -226,7 +226,7 @@ export default function ConnectionsView({
 
                       <button
                         onClick={() => onOpenChat(peerId)}
-                        className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-brand-primary hover:bg-brand-primary-hover text-white flex items-center gap-1.5 shadow"
+                        className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-brand-primary hover:bg-brand-primary-hover text-white flex items-center gap-1.5 shadow cursor-pointer"
                       >
                         Chat Space <ArrowRight className="w-3.5 h-3.5" />
                       </button>

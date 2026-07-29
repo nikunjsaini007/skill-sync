@@ -52,9 +52,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 rounded-2xl border border-brand-primary/30 bg-brand-primary/10 px-3.5 py-1.5 text-xs font-semibold text-brand-primary-hover">
-            <Flame className="h-4 w-4 animate-pulse fill-orange-400 text-orange-400" /> 5-Day Streak
-          </div>
+         
           <span className="rounded-2xl border border-brand-border/40 bg-brand-sec-bg px-3 py-1.5 text-xs font-mono text-slate-500">
             UTC: {new Date().toLocaleDateString()}
           </span>
@@ -138,7 +136,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
             </h3>
             <button 
               onClick={() => onNavigateTab("discover")} 
-              className="text-xs font-semibold text-brand-primary-hover hover:text-white transition-colors flex items-center gap-1 group"
+              className="text-xs font-semibold text-brand-primary-hover hover:text-white transition-colors flex items-center gap-1 group cursor-pointer"
             >
               Discover all peers <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </button>
@@ -205,7 +203,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
                       className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                         isConnected
                           ? "bg-brand-sec-bg text-slate-500 border border-brand-border/50 cursor-not-allowed"
-                          : "bg-brand-primary hover:bg-brand-primary-hover text-white shadow-md shadow-brand-primary/10 transform active:scale-95"
+                          : "bg-brand-primary hover:bg-brand-primary-hover text-white shadow-md shadow-brand-primary/10 transform active:scale-95 cursor-pointer"
                       }`}
                     >
                       {isConnected ? "Pending Setup" : "Connect Peer"}
@@ -275,7 +273,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
               <p className="text-[10px] text-slate-400 mt-1 mb-3">Ask Syncy AI to draft perfect conversation starters based on your matches' profiles.</p>
               <button
                 onClick={() => onNavigateTab("ai")}
-                className="text-[11px] font-bold text-brand-primary-hover hover:text-white transition-colors flex items-center gap-1 group-hover:underline"
+                className="text-[11px] font-bold text-brand-primary-hover hover:text-white transition-colors flex items-center gap-1 group-hover:underline cursor-pointer"
               >
                 Chat with Syncy <ArrowRight className="w-3.5 h-3.5" />
               </button>

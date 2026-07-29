@@ -66,4 +66,5 @@ export interface SkillItem {
   name: string;
   category: "Tech" | "Design" | "Business" | "Creative" | "Other";
   popularity: number; 
+  link: string;
 }

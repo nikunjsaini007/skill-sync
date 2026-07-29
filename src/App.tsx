@@ -479,7 +479,7 @@ export default function App() {
                     <button
                       id="btn-auth-submit"
                       type="submit"
-                      className="w-full rounded-2xl bg-gradient-to-r from-brand-primary to-brand-secondary py-3 text-sm font-bold text-white shadow-lg shadow-brand-primary/25 transition-all hover:scale-[1.01] hover:shadow-brand-primary/35"
+                      className="w-full rounded-2xl bg-gradient-to-r from-brand-primary to-brand-secondary py-3 text-sm font-bold text-white shadow-lg shadow-brand-primary/25 transition-all hover:scale-[1.01] hover:shadow-brand-primary/35 cursor-pointer"
                     >
                       {authMode === "login" ? "Log In" : "Create Account"}
                     </button>
@@ -492,7 +492,7 @@ export default function App() {
                         setAuthError("");
                         setAuthMode(authMode === "login" ? "signup" : "login");
                       }}
-                      className="font-semibold text-brand-primary hover:underline"
+                      className="font-semibold text-brand-primary hover:underline cursor-pointer"
                     >
                       {authMode === "login" ? "Sign Up Free" : "Log In"}
                     </button>
@@ -584,19 +584,19 @@ export default function App() {
                   setShowNotificationsMenu(!showNotificationsMenu);
                   if (!showNotificationsMenu) markNotificationsRead();
                 }}
-                className={`w-9 h-9 rounded-xl border border-brand-border/60 flex items-center justify-center hover:bg-brand-card/50 transition-all ${unreadNotifications > 0 ? "text-brand-primary" : "text-slate-400 hover:text-slate-200"
+                className={`w-9 h-9 rounded-xl border border-brand-border/60 flex items-center justify-center hover:bg-brand-card/50 transition-all ${unreadNotifications > 0 ? "text-brand-primary" : "text-slate-400 hover:text-slate-200 cursor-pointer"
                   }`}
               >
                 <Bell className="w-4 h-4" />
                 {unreadNotifications > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-extrabold flex items-center justify-center border-2 border-brand-bg">
+                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-extrabold flex items-center justify-center border-2 border-brand-bg cursor-pointer">
                     {unreadNotifications}
                   </span>
                 )}
               </button>
 
               {showNotificationsMenu && (
-                <div id="notifications-menu" className="absolute right-0 mt-2.5 w-80 rounded-2xl bg-brand-card border border-brand-border shadow-2xl p-4 space-y-3 animate-fadeIn">
+                <div id="notifications-menu" className="absolute right-0 mt-2.5 w-80 rounded-2xl bg-brand-card border border-brand-border shadow-2xl p-4 space-y-3 animate-fadeIn cursor-pointer">
                   <div className="flex items-center justify-between border-b border-brand-border/50 pb-2">
                     <h4 className="text-xs font-bold text-slate-200">Sync Notifications</h4>
                     <button
