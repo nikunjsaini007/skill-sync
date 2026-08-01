@@ -31,6 +31,7 @@ import Courses from "./pages/Courses";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Terms from "./pages/Terms";
 import { auth, firebaseReady, createFirebaseAccount, getFirebaseProfile, subscribeToFirebaseData, saveFirebaseProfile, createFirebaseConnection, updateFirebaseConnection, removeFirebaseConnection, sendFirebaseMessage, signInWithEmailAndPassword, signOut } from "./firebase";
+import { CallProvider } from "./calls/CallContext";
 
 export default function App() {
   
@@ -520,18 +521,19 @@ export default function App() {
   const unreadNotifications = notifications.filter(n => !n.read).length;
 
   return (
-    <div id="dashboard-container" className="min-h-screen bg-brand-bg flex text-slate-200 overflow-hidden font-sans">
+    <CallProvider currentUser={currentUser} users={users}>
+      <div id="dashboard-container" className="min-h-screen bg-brand-bg flex text-slate-200 overflow-hidden font-sans">
 
-      <Sidebar
-        activeTab={activeTab}
-        setActiveTab={(tab) => {
-          setActivePeerProfile(null);
-          setActiveTab(tab);
-          setMobileMenuOpen(false);
-        }}
-        currentUser={currentUser}
-        onLogout={handleLogout}
-      />
+        <Sidebar
+          activeTab={activeTab}
+          setActiveTab={(tab) => {
+            setActivePeerProfile(null);
+            setActiveTab(tab);
+            setMobileMenuOpen(false);
+          }}
+          currentUser={currentUser}
+          onLogout={handleLogout}
+        />
 
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
@@ -644,20 +646,20 @@ export default function App() {
         {mobileMenuOpen && (
           <div className="fixed inset-0 z-50 bg-brand-bg/95 flex flex-col p-6 space-y-6 md:hidden">
             <div className="flex items-center justify-between">
-              <span className="text-xl font-bold text-white font-display">Navigation Menu</span>
+              <span className="text-xl font-bold text-white font-display">Menu</span>
               <button onClick={() => setMobileMenuOpen(false)} className="text-slate-400 hover:text-white">
                 <X className="w-6 h-6" />
               </button>
             </div>
 
-            <nav className="flex-1 flex flex-col justify-center space-y-4">
+            <nav className="flex-1 flex flex-col justify-center space-y-4 cursor-pointer">
               {[
                 { id: "dashboard", label: "Dashboard" },
-                { id: "discover", label: "Discover Directory" },
-                { id: "connections", label: "Swap Network" },
-                { id: "messages", label: "P2P Safe Chat" },
-                { id: "ai", label: "Syncy AI Mentor (Gemini)" },
-                { id: "profile", label: "My Profile" },
+                { id: "discover", label: "Discover" },
+                { id: "connections", label: "Connections" },
+                { id: "messages", label: "Messages" },
+                { id: "ai", label: "Syncy AI" },
+                { id: "profile", label: "Profile" },
                 { id: "settings", label: "Settings" }
               ].map(item => (
                 <button
@@ -667,7 +669,7 @@ export default function App() {
                     setActiveTab(item.id);
                     setMobileMenuOpen(false);
                   }}
-                  className={`py-3 text-lg font-bold text-left border-b border-brand-border/40 ${activeTab === item.id ? "text-brand-primary" : "text-slate-400"
+                  className={`py-3 text-lg font-bold text-left border-b border-brand-border/40 ${activeTab === item.id ? "text-brand-primary" : "text-slate-400 cursor-pointer hover:text-slate-200 transition-colors"
                     }`}
                 >
                   {item.label}
@@ -690,7 +692,8 @@ export default function App() {
         </main>
       </div>
 
-    </div>
+      </div>
+    </CallProvider>
     
   );
 

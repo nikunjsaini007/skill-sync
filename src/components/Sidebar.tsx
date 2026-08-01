@@ -76,7 +76,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group soft-3d ${
+                className={`w-full flex items-center gap-3 px-3 py-2.5 cursor-pointer rounded-xl text-xs font-semibold transition-all group soft-3d ${
                   isActive
                     ? item.highlight
                       ? "bg-gradient-to-r from-brand-primary/20 to-brand-accent/20 text-white border-l-2 border-brand-accent font-bold"
@@ -114,7 +114,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
             <p className="text-[9px] text-slate-500 mt-1 mb-2.5">Get more matches and faster AI plans.</p>
             <button
               onClick={() => setActiveTab("settings")}
-              className="w-full py-1.5 rounded-lg text-[10px] font-bold bg-brand-primary hover:bg-brand-primary-hover text-white transition-colors"
+              className="w-full py-1.5 rounded-lg text-[10px] font-bold bg-brand-primary hover:bg-brand-primary-hover text-white transition-colors cursor-pointer"
             >
               Upgrade Now
             </button>
@@ -123,7 +123,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
 
         <button
           onClick={onLogout}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-red-400 hover:bg-red-500/5 transition-all"
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-red-400 hover:bg-red-500/5 transition-all cursor-pointer"
         >
           <LogOut className="w-4 h-4 shrink-0" />
           <span>Log Out</span>

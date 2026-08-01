@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
-import { MessageSquare, Send, CheckCheck, Smile, HelpCircle, Sparkles, Brain, Code, Zap } from "lucide-react";
+import { MessageSquare, Send, CheckCheck, Smile, HelpCircle, Sparkles, Brain, Code, Zap, Phone, Video } from "lucide-react";
 import { UserProfile, Connection, Message } from "../types";
 import { Image } from "lucide-react";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../firebase";
+import { useCalls } from "../calls/CallContext";
 
 interface MessagesViewProps {
   currentUser: UserProfile;
@@ -31,6 +32,7 @@ export default function MessagesView({
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const { activeCall, startCall } = useCalls();
 
 
   const activeConns = connections.filter(
@@ -233,19 +235,48 @@ export default function MessagesView({
           <>
 
             <div className="flex items-center justify-between border-b border-brand-border/40 bg-gradient-to-r from-brand-sec-bg/40 to-brand-bg/40 p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden border border-brand-border relative">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-full overflow-hidden border border-brand-border relative shrink-0">
                   <img src={activePeer.avatar} alt={activePeer.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                   <span className="w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-brand-bg absolute bottom-0 right-0" />
                 </div>
-                <div>
-                  <h3 className="text-xs font-bold text-slate-200 leading-none">{activePeer.name}</h3>
-                  <span className="text-[10px] text-slate-500 mt-1 block">Active Now • {activePeer.college}</span>
+                <div className="min-w-0">
+                  <h3 className="text-xs font-bold text-slate-200 leading-none truncate">{activePeer.name}</h3>
+                  <span className="text-[10px] text-slate-500 mt-1 block truncate">Active Now • {activePeer.college}</span>
                 </div>
               </div>
 
-              <div className="text-[10px] text-slate-400 hidden sm:block bg-brand-card/40 border border-brand-border px-3 py-1.5 rounded-xl">
-                Swap Track: <span className="text-brand-primary-hover font-semibold">{currentUser.skillsWanted[0]}</span> for <span className="text-brand-accent font-semibold">{activePeer.skillsWanted[0]}</span>
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-1.5 rounded-xl border border-brand-border/60 bg-brand-card/40 p-1">
+                  <button
+                    id="btn-voice-call"
+                    onClick={() => startCall(activePeer.id, "voice")}
+                    disabled={Boolean(activeCall)}
+                    title={activeCall ? "You are already in a call" : `Start a voice call with ${activePeer.name}`}
+                    aria-label={`Start a voice call with ${activePeer.name}`}
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                      activeCall ? "opacity-40 pointer-events-none" : "hover:bg-brand-primary/15 text-slate-400 hover:text-brand-primary-hover"
+                    }`}
+                  >
+                    <Phone className="w-4 h-4" />
+                  </button>
+                  <button
+                    id="btn-video-call"
+                    onClick={() => startCall(activePeer.id, "video")}
+                    disabled={Boolean(activeCall)}
+                    title={activeCall ? "You are already in a call" : `Start a video call with ${activePeer.name}`}
+                    aria-label={`Start a video call with ${activePeer.name}`}
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                      activeCall ? "opacity-40 pointer-events-none" : "hover:bg-brand-primary/15 text-slate-400 hover:text-brand-primary-hover"
+                    }`}
+                  >
+                    <Video className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="text-[10px] text-slate-400 hidden sm:block bg-brand-card/40 border border-brand-border px-3 py-1.5 rounded-xl">
+                  Swap Track: <span className="text-brand-primary-hover font-semibold">{currentUser.skillsWanted[0]}</span> for <span className="text-brand-accent font-semibold">{activePeer.skillsWanted[0]}</span>
+                </div>
               </div>
             </div>
 
