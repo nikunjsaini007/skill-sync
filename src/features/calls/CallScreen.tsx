@@ -105,7 +105,7 @@ export default function CallScreen({ call, peer, currentUser, onTerminal }: Call
   );
 
   const controlButton = (extra: string) =>
-    `flex h-12 w-12 items-center justify-center rounded-full text-white transition-all hover:scale-105 active:scale-95 cursor-pointer ${extra}`;
+    `flex h-12 w-12 items-center justify-center rounded-full text-white keep-light-text transition-all hover:scale-105 active:scale-95 cursor-pointer ${extra}`;
 
   const isVideo = call.type === "video";
 
@@ -375,7 +375,7 @@ function VoiceCallLayout({
 }) {
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-between bg-gradient-to-br from-brand-bg via-brand-sec-bg to-brand-bg p-6">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(88,101,242,0.14),transparent_55%),radial-gradient(circle_at_80%_80%,rgba(168,85,247,0.1),transparent_45%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(56,189,248,0.14),transparent_55%),radial-gradient(circle_at_80%_80%,rgba(250,204,21,0.1),transparent_45%)]" />
 
       <audio ref={remoteAudioRef} autoPlay playsInline />
 

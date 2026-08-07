@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import type { Connection, Message, Notification, UserProfile } from "@/lib/types";
 import Sidebar from "@/components/layout/Sidebar";
 import TopNav from "@/components/layout/TopNav";
 import MobileMenu from "@/components/layout/MobileMenu";
+import AuroraBackground from "@/components/AuroraBackground";
 import { DashboardView } from "@/features/dashboard";
 import { DiscoverView, ConnectionsView } from "@/features/connections";
 import { MessagesView } from "@/features/messages";
@@ -17,6 +19,8 @@ interface DashboardPageProps {
   connections: Connection[];
   messages: Message[];
   notifications: Notification[];
+  theme: "dark" | "light";
+  onThemeChange: (theme: "dark" | "light") => void;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   activeChatPeerId: string | null;
@@ -43,6 +47,8 @@ export default function DashboardPage({
   connections,
   messages,
   notifications,
+  theme,
+  onThemeChange,
   activeTab,
   setActiveTab,
   activeChatPeerId,
@@ -162,7 +168,7 @@ export default function DashboardPage({
           <Onboarding
             email={currentUser.email}
             initialProfile={currentUser}
-            initialStep={2}
+            initialStep={1}
             mode="edit"
             onComplete={onSaveProfile}
             onCancel={() => setActiveTab("profile")}
@@ -172,6 +178,8 @@ export default function DashboardPage({
         return (
           <SettingsView
             currentUser={currentUser}
+            theme={theme}
+            onThemeChange={onThemeChange}
             onUpdatePlan={onUpdatePlan}
             onResetData={onResetData}
             onLogout={onLogout}
@@ -183,7 +191,9 @@ export default function DashboardPage({
   };
 
   return (
-    <div id="dashboard-container" className="min-h-screen bg-brand-bg flex text-slate-200 overflow-hidden font-sans">
+    <div id="dashboard-container" className="relative min-h-screen bg-[linear-gradient(180deg,#0A1428_0%,#060B16_55%,#04070F_100%)] flex text-slate-200 overflow-hidden font-sans">
+
+      <AuroraBackground className="z-0" />
 
       <Sidebar
         activeTab={activeTab}
@@ -192,7 +202,7 @@ export default function DashboardPage({
         onLogout={onLogout}
       />
 
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="relative z-10 flex-1 flex flex-col h-screen overflow-hidden">
 
         <TopNav
           currentUser={currentUser}
@@ -215,7 +225,17 @@ export default function DashboardPage({
         )}
 
         <main className="flex-1 overflow-y-auto">
-          {renderActiveView()}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+            >
+              {renderActiveView()}
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
 

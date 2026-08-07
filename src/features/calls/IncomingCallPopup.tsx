@@ -63,7 +63,7 @@ export default function IncomingCallPopup({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-bg/80 p-4 backdrop-blur-md">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(88,101,242,0.12),transparent_55%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.12),transparent_55%)]" />
 
       <motion.div
         initial={{ opacity: 0, scale: 0.92, y: 16 }}
@@ -113,7 +113,7 @@ export default function IncomingCallPopup({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleDecline}
-            className="flex h-14 w-14 flex-col items-center justify-center gap-1 text-white"
+            className="flex h-14 w-14 flex-col items-center justify-center gap-1 text-white keep-light-text"
           >
             <span className="flex h-14 w-14 items-center justify-center rounded-full bg-red-500/90 shadow-lg shadow-red-500/30 transition-colors hover:bg-red-500">
               <PhoneOff className="h-5 w-5" />
@@ -125,7 +125,7 @@ export default function IncomingCallPopup({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleAccept}
-            className="flex h-14 w-14 flex-col items-center justify-center gap-1 text-white"
+            className="flex h-14 w-14 flex-col items-center justify-center gap-1 text-white keep-light-text"
           >
             <span className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/90 shadow-lg shadow-emerald-500/30 transition-colors hover:bg-emerald-500">
               {call.type === "video" ? <Video className="h-5 w-5" /> : <Phone className="h-5 w-5" />}

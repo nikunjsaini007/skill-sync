@@ -16,7 +16,6 @@ export interface UserProfile {
   rating: number;
   reviewsCount: number;
   achievements: string[];
-  location?: string;
   createdAt?: string;
 }
 

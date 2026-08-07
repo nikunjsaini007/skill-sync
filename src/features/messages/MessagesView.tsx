@@ -339,9 +339,9 @@ export default function MessagesView({
               {isTyping && (
                 <div className="flex justify-start">
                   <div className="bg-brand-card border border-brand-border p-3 rounded-2xl rounded-tl-none text-xs text-slate-400 flex items-center gap-1.5 shadow-md">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce delay-100" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce delay-200" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-bounce" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-bounce delay-100" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-bounce delay-200" />
                     <span className="text-[10px] text-slate-500 font-medium ml-1">{activePeer.name} is typing...</span>
                   </div>
                 </div>
@@ -361,7 +361,7 @@ export default function MessagesView({
 
                   <button
                     onClick={() => setSelectedImage(null)}
-                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600"
+                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white keep-light-text flex items-center justify-center hover:bg-red-600"
                   >
                     ✕
                   </button>

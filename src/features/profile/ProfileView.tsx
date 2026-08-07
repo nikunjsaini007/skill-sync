@@ -1,5 +1,5 @@
 import { UserProfile, Review } from "@/lib/types";
-import { Star, Award, MapPin, GraduationCap, Mail, Shield, Check, Flame, Pencil } from "lucide-react";
+import { Star, Award, GraduationCap, Mail, Shield, Check, Flame, Pencil } from "lucide-react";
 import { MOCK_REVIEWS } from "@/data";
 
 interface ProfileViewProps {
@@ -136,14 +136,6 @@ export default function ProfileView({
                   <div className="font-semibold text-slate-300 mt-1">{activeUser.college}</div>
                 </div>
               </div>
-
-              <div className="flex items-center gap-2 text-slate-400">
-                <MapPin className="w-4 h-4 text-brand-secondary" />
-                <div>
-                  <div className="text-[10px] text-slate-500 uppercase font-bold leading-none">Location</div>
-                  <div className="font-semibold text-slate-300 mt-1">{activeUser.location || "San Francisco, CA"}</div>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -163,10 +155,10 @@ export default function ProfileView({
 
            
             <div className="space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-widest text-purple-400">Wants to Learn</h4>
+              <h4 className="text-xs font-bold uppercase tracking-widest text-sky-400">Wants to Learn</h4>
               <div className="flex flex-wrap gap-1.5">
                 {activeUser.skillsWanted.map((sk, idx) => (
-                  <span key={idx} className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-purple-500/5 text-purple-300 border border-purple-500/10">
+                  <span key={idx} className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-sky-500/5 text-sky-300 border border-sky-500/10">
                     {sk}
                   </span>
                 ))}

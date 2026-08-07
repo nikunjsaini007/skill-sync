@@ -31,7 +31,7 @@ export default function AuthModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-brand-bg/85 p-4 backdrop-blur-xl">
       <div className="relative w-full max-w-5xl overflow-hidden rounded-[2rem] border border-brand-border/70 bg-gradient-to-br from-brand-card via-brand-card/95 to-brand-sec-bg/80 shadow-[0_25px_80px_rgba(2,6,23,0.45)]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(88,101,242,0.16),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.16),transparent_45%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.16),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(250,204,21,0.16),transparent_45%)]" />
         <button
           id="btn-close-auth"
           onClick={onClose}

@@ -32,12 +32,14 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
   ];
 
   return (
-    <aside id="app-sidebar" className="w-64 card-shell flex flex-col justify-between p-4 shrink-0 h-screen sticky top-0 hidden md:flex backdrop-blur-md z-30 rounded-r-[1.6rem]">
+    <aside id="app-sidebar" className="w-64 card-shell flex flex-col justify-between p-4 shrink-0 h-screen sticky top-0 hidden md:flex backdrop-blur-md z-30 rounded-r-[1.6rem] overflow-hidden">
       
-    
-      <div className="space-y-6">
+      <div className="absolute -top-28 -right-20 w-72 h-72 rounded-full bg-brand-primary/10 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-24 -left-24 w-64 h-64 rounded-full bg-brand-accent/8 blur-3xl pointer-events-none" />
+
+      <div className="space-y-6 relative">
         <div className="flex items-center space-x-3 px-2 py-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-primary to-brand-accent flex items-center justify-center shadow-[0_10px_25px_rgba(88,101,242,0.25)]">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-primary to-brand-accent flex items-center justify-center shadow-[0_10px_25px_rgba(56,189,248,0.25)]">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div className="flex flex-col">
@@ -79,8 +81,8 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
                 className={`w-full flex items-center gap-3 px-3 py-2.5 cursor-pointer rounded-xl text-xs font-semibold transition-all group soft-3d ${
                   isActive
                     ? item.highlight
-                      ? "bg-gradient-to-r from-brand-primary/20 to-brand-accent/20 text-white border-l-2 border-brand-accent font-bold"
-                      : "bg-brand-primary/10 text-brand-primary-hover border-l-2 border-brand-primary font-bold"
+                      ? "bg-gradient-to-r from-brand-primary/20 to-brand-accent/20 text-white border-l-2 border-brand-accent font-bold shadow-lg shadow-brand-accent/10"
+                      : "bg-brand-primary/10 text-brand-primary-hover border-l-2 border-brand-primary font-bold shadow-lg shadow-brand-primary/10"
                     : "text-slate-400 hover:text-slate-200 hover:bg-brand-card/30"
                 }`}
               >
@@ -103,7 +105,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
       </div>
 
      
-      <div className="space-y-4">
+      <div className="space-y-4 relative">
         
         {!currentUser.isPremium && (
           <div className="p-3.5 rounded-[1.1rem] bg-gradient-to-br from-brand-card to-brand-bg border border-brand-primary/30 relative overflow-hidden soft-3d ambient-sheen">

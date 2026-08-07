@@ -23,7 +23,7 @@ export default function TopNav({
   onMobileMenuToggle,
 }: TopNavProps) {
   return (
-    <header id="top-nav" className="h-16 border-b border-brand-border/40 px-6 flex items-center justify-between bg-brand-sec-bg/15 shrink-0 relative z-40">
+    <header id="top-nav" className="h-16 border-b border-brand-border/40 px-6 flex items-center justify-between bg-brand-bg/25 backdrop-blur-xl shrink-0 relative z-40">
 
       <button
         onClick={onMobileMenuToggle}
@@ -62,19 +62,22 @@ export default function TopNav({
           <button
             id="btn-bell"
             onClick={onToggleNotifications}
-            className={`w-9 h-9 rounded-xl border border-brand-border/60 flex items-center justify-center hover:bg-brand-card/50 transition-all ${unreadNotifications > 0 ? "text-brand-primary" : "text-slate-400 hover:text-slate-200 cursor-pointer"
-              }`}
+            className={`w-9 h-9 rounded-xl border border-brand-border/60 flex items-center justify-center transition-all cursor-pointer ${
+              unreadNotifications > 0
+                ? "text-brand-primary border-brand-primary/40 bg-brand-primary/10 shadow-[0_0_16px_rgba(56,189,248,0.2)]"
+                : "text-slate-400 hover:text-slate-200 hover:bg-brand-card/50"
+            }`}
           >
             <Bell className="w-4 h-4" />
             {unreadNotifications > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-extrabold flex items-center justify-center border-2 border-brand-bg cursor-pointer">
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white keep-light-text text-[9px] font-extrabold flex items-center justify-center border-2 border-brand-bg cursor-pointer">
                 {unreadNotifications}
               </span>
             )}
           </button>
 
           {showNotificationsMenu && (
-            <div id="notifications-menu" className="absolute right-0 mt-2.5 w-80 rounded-2xl bg-brand-card border border-brand-border shadow-2xl p-4 space-y-3 animate-fadeIn cursor-pointer">
+            <div id="notifications-menu" className="absolute right-0 mt-2.5 w-80 rounded-2xl bg-brand-card/90 backdrop-blur-xl border border-brand-border shadow-2xl p-4 space-y-3 animate-fadeIn cursor-pointer">
               <div className="flex items-center justify-between border-b border-brand-border/50 pb-2">
                 <h4 className="text-xs font-bold text-slate-200">Sync Notifications</h4>
                 <button

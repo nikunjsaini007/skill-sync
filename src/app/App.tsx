@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import type { Connection, Message, Notification, UserProfile } from "@/lib/types";
-import { CONNECTIONS_KEY, MESSAGES_KEY, NOTIFICATIONS_KEY, USER_KEY } from "@/lib/constants";
+import { CONNECTIONS_KEY, MESSAGES_KEY, NOTIFICATIONS_KEY, THEME_KEY, USER_KEY } from "@/lib/constants";
 import { seedConnections, seedMessages, seedNotifications } from "@/data";
 import { auth, firebaseReady } from "@/services/firebase";
 import {
@@ -26,9 +27,22 @@ import AuthModal from "@/features/auth/AuthModal";
 import Courses from "@/pages/Courses";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Terms from "@/pages/Terms";
+import Support from "@/pages/Support";
 
 export default function App() {
   const [users, setUsers] = useState<UserProfile[]>([]);
+
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    const saved = localStorage.getItem(THEME_KEY);
+    const next: "dark" | "light" = saved === "light" ? "light" : "dark";
+    document.documentElement.classList.toggle("light", next === "light");
+    return next;
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("light", theme === "light");
+    localStorage.setItem(THEME_KEY, theme);
+  }, [theme]);
 
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
     const saved = localStorage.getItem(USER_KEY);
@@ -282,6 +296,20 @@ export default function App() {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   };
 
+  const location = useLocation();
+
+  if (location.pathname === "/privacy-policy") {
+    return <PrivacyPolicy />;
+  }
+
+  if (location.pathname === "/terms") {
+    return <Terms />;
+  }
+
+  if (location.pathname === "/support") {
+    return <Support />;
+  }
+
   if (!currentUser) {
     return (
       <div className="relative min-h-screen bg-brand-bg text-slate-100 overflow-hidden font-sans">
@@ -321,6 +349,8 @@ export default function App() {
         connections={connections}
         messages={messages}
         notifications={notifications}
+        theme={theme}
+        onThemeChange={setTheme}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         activeChatPeerId={activeChatPeerId}

@@ -221,10 +221,10 @@ export default function DiscoverView({ currentUser, connections, users, onConnec
                   </div>
 
                   <div className="space-y-1">
-                    <span className="text-[8px] font-bold uppercase tracking-wider text-purple-400 block">Wants</span>
+                    <span className="text-[8px] font-bold uppercase tracking-wider text-sky-400 block">Wants</span>
                     <div className="flex flex-wrap gap-1">
                       {peer.skillsWanted.slice(0, 3).map((sk, idx) => (
-                        <span key={idx} className="text-[10px] px-2 py-0.5 rounded bg-purple-500/5 text-purple-300 border border-purple-500/10">
+                        <span key={idx} className="text-[10px] px-2 py-0.5 rounded bg-sky-500/5 text-sky-300 border border-sky-500/10">
                           {sk}
                         </span>
                       ))}

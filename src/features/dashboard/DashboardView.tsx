@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { 
   Zap, 
@@ -22,6 +23,22 @@ interface DashboardViewProps {
   onConnectPeer: (peerId: string) => void;
 }
 
+function useCountUp(target: number, duration = 1200) {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    let raf = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min((now - start) / duration, 1);
+      setValue(target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+  return value;
+}
+
 export default function DashboardView({ currentUser, connections, onNavigateTab, onConnectPeer }: DashboardViewProps) {
 
   const matches = MOCK_USERS.map(peer => {
@@ -39,13 +56,18 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
   const activeConnections = connections.filter(c => c.status === "accepted").length;
   const pendingRequests = connections.filter(c => c.status === "pending" && c.receiverId === currentUser.id).length;
 
+  const matchesCount = useCountUp(12);
+  const swapsCount = useCountUp(activeConnections);
+  const pendingCount = useCountUp(pendingRequests);
+  const ratingCount = useCountUp(5);
+
   return (
     <div id="dashboard-view" className="space-y-8 p-6 max-w-6xl mx-auto font-sans">
       
      
-      <div className="hero-panel flex flex-col md:flex-row items-start md:items-center justify-between gap-4 rounded-[1.8rem] p-6">
+      <div className="hero-panel flex flex-col md:flex-row items-start md:items-center justify-between gap-4 rounded-[1.8rem] p-6 soft-3d">
         <div>
-          <h1 className="text-3xl font-bold font-display text-white">
+          <h1 className="text-3xl font-bold font-display text-white bg-gradient-to-r from-white via-sky-100 to-brand-primary-hover bg-clip-text text-transparent">
             Welcome back, {currentUser.name}!
           </h1>
           <p className="mt-1 text-sm text-slate-400">
@@ -63,15 +85,15 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
   
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
        
-        <div className="p-5 rounded-2xl bg-brand-card/45 border border-brand-border/50 flex flex-col justify-between">
+        <div className="p-5 rounded-2xl bg-brand-card/45 border border-brand-border/50 flex flex-col justify-between soft-3d group relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Matches Found</span>
-            <div className="w-7 h-7 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 border border-indigo-500/20">
+            <div className="w-7 h-7 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-400 border border-sky-500/20">
               <Zap className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-3xl font-bold font-display text-white">12</div>
+            <div className="text-3xl font-bold font-display text-white">{Math.round(matchesCount)}</div>
             <p className="text-[10px] text-emerald-400 mt-1 font-medium flex items-center gap-1">
               <TrendingUp className="w-3 h-3" /> +4 new recommendations
             </p>
@@ -79,15 +101,15 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
         </div>
 
       
-        <div className="p-5 rounded-2xl bg-brand-card/45 border border-brand-border/50 flex flex-col justify-between">
+        <div className="p-5 rounded-2xl bg-brand-card/45 border border-brand-border/50 flex flex-col justify-between soft-3d group relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active Swaps</span>
-            <div className="w-7 h-7 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20">
+            <div className="w-7 h-7 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 border border-blue-500/20">
               <CheckCircle className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-3xl font-bold font-display text-white">{activeConnections}</div>
+            <div className="text-3xl font-bold font-display text-white">{Math.round(swapsCount)}</div>
             <p className="text-[10px] text-slate-500 mt-1 font-mono">
               In-session exchange tracks
             </p>
@@ -95,7 +117,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
         </div>
 
     
-        <div className="p-5 rounded-2xl bg-brand-card/45 border border-brand-border/50 flex flex-col justify-between">
+        <div className="p-5 rounded-2xl bg-brand-card/45 border border-brand-border/50 flex flex-col justify-between soft-3d group relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pending Requests</span>
             <div className="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400 border border-amber-500/20">
@@ -103,7 +125,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-3xl font-bold font-display text-white">{pendingRequests}</div>
+            <div className="text-3xl font-bold font-display text-white">{Math.round(pendingCount)}</div>
             <p className="text-[10px] text-amber-400 mt-1 font-semibold">
               Needs your confirmation
             </p>
@@ -111,7 +133,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
         </div>
 
         
-        <div className="p-5 rounded-2xl bg-brand-card/45 border border-brand-border/50 flex flex-col justify-between">
+        <div className="p-5 rounded-2xl bg-brand-card/45 border border-brand-border/50 flex flex-col justify-between soft-3d group relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Trust Rating</span>
             <div className="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
@@ -119,7 +141,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-3xl font-bold font-display text-white">5.0 ★</div>
+            <div className="text-3xl font-bold font-display text-white">{ratingCount.toFixed(1)} ★</div>
             <p className="text-[10px] text-slate-500 mt-1">
               Top educator status active
             </p>
@@ -180,7 +202,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
                         <span className="text-emerald-400 font-semibold bg-emerald-500/5 px-2 py-0.5 rounded border border-emerald-500/10">
                           Teaches: {peer.skillsOffered.slice(0, 2).join(", ")}
                         </span>
-                        <span className="text-purple-400 font-semibold bg-purple-500/5 px-2 py-0.5 rounded border border-purple-500/10">
+                        <span className="text-blue-400 font-semibold bg-blue-500/5 px-2 py-0.5 rounded border border-blue-500/10">
                           Wants: {peer.skillsWanted.slice(0, 2).join(", ")}
                         </span>
                       </div>
@@ -228,13 +250,20 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
            
             <div className="space-y-2.5">
               <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Active Swap Track</h4>
-              <div className="p-3.5 rounded-[1rem] bg-brand-bg/50 border border-brand-border flex items-center justify-between glow-chip">
-                <div>
-                  <div className="text-xs font-bold text-slate-200">TypeScript Roadmap</div>
-                  <p className="text-[10px] text-slate-500 mt-0.5">Assigned by Syncy AI</p>
+              <div className="p-3.5 rounded-[1rem] bg-brand-bg/50 border border-brand-border glow-chip">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-xs font-bold text-slate-200">TypeScript Roadmap</div>
+                    <p className="text-[10px] text-slate-500 mt-0.5">Assigned by Syncy AI</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs font-semibold text-brand-accent">65% Done</div>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-xs font-semibold text-brand-accent">65% Done</div>
+                <div className="mt-2.5 h-1.5 rounded-full bg-brand-border/40 overflow-hidden">
+                  <div className="h-full w-[65%] rounded-full bg-gradient-to-r from-brand-primary to-brand-accent relative overflow-hidden">
+                    <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent)] animate-[shimmer-line_2.2s_ease-in-out_infinite]" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -245,7 +274,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
               
               <div className="space-y-2.5">
                 <div className="p-3 rounded-xl bg-brand-bg/40 border border-brand-border/60 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 border border-indigo-500/20 shrink-0">
+                  <div className="w-9 h-9 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-400 border border-sky-500/20 shrink-0">
                     <Calendar className="w-4 h-4" />
                   </div>
                   <div>
@@ -255,7 +284,7 @@ export default function DashboardView({ currentUser, connections, onNavigateTab,
                 </div>
 
                 <div className="p-3 rounded-xl bg-brand-bg/40 border border-brand-border/60 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20 shrink-0">
+                  <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 border border-blue-500/20 shrink-0">
                     <Calendar className="w-4 h-4" />
                   </div>
                   <div>

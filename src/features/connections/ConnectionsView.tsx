@@ -210,7 +210,7 @@ export default function ConnectionsView({
                           <span className="text-emerald-400 font-semibold">Gives:</span> {peer.skillsOffered.slice(0, 2).join(", ")}
                         </div>
                         <div>
-                          <span className="text-purple-400 font-semibold">Takes:</span> {peer.skillsWanted.slice(0, 2).join(", ")}
+                          <span className="text-sky-400 font-semibold">Takes:</span> {peer.skillsWanted.slice(0, 2).join(", ")}
                         </div>
                       </div>
                     </div>

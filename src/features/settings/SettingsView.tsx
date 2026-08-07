@@ -4,16 +4,17 @@ import { UserProfile } from "@/lib/types";
 
 interface SettingsViewProps {
   currentUser: UserProfile;
+  theme: "dark" | "light";
+  onThemeChange: (theme: "dark" | "light") => void;
   onUpdatePlan: (isPremium: boolean) => void;
   onResetData: () => void;
   onLogout: () => void;
 }
 
-export default function SettingsView({ currentUser, onUpdatePlan, onResetData, onLogout }: SettingsViewProps) {
+export default function SettingsView({ currentUser, theme, onThemeChange, onUpdatePlan, onResetData, onLogout }: SettingsViewProps) {
   const [successMsg, setSuccessMsg] = useState("");
   const [privacyMode, setPrivacyMode] = useState(true);
   const [emailAlerts, setEmailAlerts] = useState(true);
-  const [themeMode, setThemeMode] = useState("dark"); 
 
   const handleTogglePremium = () => {
     setSuccessMsg("");
@@ -99,9 +100,9 @@ export default function SettingsView({ currentUser, onUpdatePlan, onResetData, o
             <label className="text-[11px] font-semibold text-slate-400">Interface Theme</label>
             <div className="grid grid-cols-2 gap-2">
               <button
-                onClick={() => setThemeMode("dark")}
+                onClick={() => onThemeChange("dark")}
                 className={`py-2 rounded-lg text-xs font-bold transition-colors border ${
-                  themeMode === "dark"
+                  theme === "dark"
                     ? "bg-brand-primary/10 border-brand-primary text-brand-primary-hover"
                     : "bg-brand-bg border-brand-border text-slate-500"
                 }`}
@@ -109,8 +110,12 @@ export default function SettingsView({ currentUser, onUpdatePlan, onResetData, o
                 Dark Cosmic (Classic)
               </button>
               <button
-                onClick={() => alert("SkillSync's premium Dark Cosmic theme matches our startup founders visual brand. Light mode is currently disabled.")}
-                className="py-2 rounded-lg text-xs font-medium bg-brand-bg/50 border border-brand-border/30 text-slate-700 cursor-not-allowed"
+                onClick={() => onThemeChange("light")}
+                className={`py-2 rounded-lg text-xs font-bold transition-colors border ${
+                  theme === "light"
+                    ? "bg-brand-primary/10 border-brand-primary text-brand-primary-hover"
+                    : "bg-brand-bg border-brand-border text-slate-500"
+                }`}
               >
                 Light Minimal (PRO)
               </button>

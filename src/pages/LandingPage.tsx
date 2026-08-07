@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { ArrowRight, Code, Palette, Zap, MessageSquare, Award, Sparkles, Star, CheckCircle, Flame, Shield, ArrowUpRight, Check } from "lucide-react";
 import { POPULAR_SKILLS } from "@/data";
 import { Link } from "react-router-dom";
+import GalaxyField from "@/components/GalaxyField";
 
 interface LandingPageProps {
   onStartAuth: (mode: "login" | "signup") => void;
@@ -26,14 +27,27 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
 
 
   return (
-    <div id="landing-container" className="relative min-h-screen bg-brand-bg text-slate-100 overflow-hidden font-sans">
+    <div id="landing-container" className="relative min-h-screen bg-[linear-gradient(180deg,#0A1428_0%,#060B16_45%,#04070F_100%)] text-slate-100 overflow-hidden font-sans">
 
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-screen h-[100dvh] overflow-hidden bg-brand-bg z-10 pointer-events-none">
+        <video
+          className="absolute inset-0 h-full w-full object-cover scale-110 hero-video"
+          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260314_131748_f2ca2a28-fed7-44c8-b9a9-bd9acdd5ec31.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+        />
+        <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent to-brand-bg" />
+      </div>
 
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full ambient-glow-1 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-[20%] right-[-10%] w-[60%] h-[60%] rounded-full ambient-glow-2 blur-3xl pointer-events-none" />
-      <div className="absolute top-[40%] left-[30%] w-[40%] h-[40%] rounded-full ambient-glow-3 blur-3xl pointer-events-none" />
+      <div aria-hidden="true" className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_8%,rgba(56,189,248,0.14),transparent_45%),radial-gradient(circle_at_88%_55%,rgba(250,204,21,0.08),transparent_40%),radial-gradient(circle_at_8%_82%,rgba(56,189,248,0.08),transparent_45%)]" />
+        <GalaxyField className="absolute inset-0 h-full w-full" density={0.9} cometInterval={2600} mouseParallax />
+      </div>
 
-      <nav id="landing-navbar" className="fixed inset-x-0 top-0 z-50 mx-4 mt-4 rounded-full border border-brand-border/50 bg-brand-bg/70 px-4 py-3 shadow-[0_10px_40px_rgba(2,6,23,0.35)] backdrop-blur-xl md:mx-6 md:px-6">
+      <nav id="landing-navbar" style={{ position: "fixed" }} className="fixed inset-x-0 top-0 z-50 mx-4 mt-4 rounded-full liquid-glass px-4 py-3 md:mx-6 md:px-6">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center space-x-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-tr from-brand-primary to-brand-accent shadow-lg shadow-brand-primary/20">
@@ -46,12 +60,10 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
 
 
           <div className="hidden items-center gap-2 rounded-full border border-brand-border/40 bg-brand-card/40 px-2 py-2 md:flex">
-            <a href="#how-it-works" className="rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-brand-primary/10 hover:text-brand-primary-hover">How it Works</a>
-            <a href="#popular-skills" className="rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-brand-primary/10 hover:text-brand-primary-hover">Skills</a>
-            <a href="#features" className="rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-brand-primary/10 hover:text-brand-primary-hover">Features</a>
-            <a href="#testimonials" className="rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-brand-primary/10 hover:text-brand-primary-hover">Sync Stories</a>
-
-
+            <a href="#how-it-works" className="rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-colors duration-300 hover:text-white">How it Works</a>
+            <a href="#popular-skills" className="rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-colors duration-300 hover:text-white">Skills</a>
+            <a href="#features" className="rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-colors duration-300 hover:text-white">Features</a>
+            <a href="#testimonials" className="rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-colors duration-300 hover:text-white">Sync Stories</a>
           </div>
 
 
@@ -75,40 +87,25 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
       </nav>
 
 
-      <header className="relative max-w-7xl mx-auto px-6 pt-16 pb-24 md:pt-24 md:pb-36 flex flex-col lg:flex-row items-center gap-13 z-10">
+      <header className="relative max-w-7xl mx-auto px-6 pt-16 pb-24 md:pt-24 md:pb-36 flex flex-col lg:flex-row items-center gap-13 z-10 min-h-[100dvh]">
 
 
         <div className="flex-1 space-y-8 text-center lg:text-left mt-10">
 
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="hero-title font-black font-display text-white"
-          >
+          <h1 className="hero-title font-black font-display text-white animate-fade-rise">
             <span className="hero-line">Learn Skills.</span>
             <span className="hero-line">Teach Skills.</span>
             <span className="hero-line hero-line--accent fancy-text">
               Grow Together.
             </span>
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-slate-400 max-w-xl mx-auto lg:mx-0 leading-relaxed font-sans"
-          >
+          <p className="text-lg md:text-xl text-white text-slate-400 max-w-xl mx-auto lg:mx-0 leading-relaxed font-sans animate-fade-rise-delay">
             Skip the expensive courses and learn by sharing skills with real people. Give what you know, get what you need, and grow together.
-          </motion.p>
+          </p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
-          >
+          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 animate-fade-rise-delay-2">
             <button
               id="btn-hero-signup"
               onClick={() => onStartAuth("signup")}
@@ -122,7 +119,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
             >
               Explore Skills
             </button></a>
-          </motion.div>
+          </div>
 
           <motion.div
             initial={{ opacity: 0 }}
@@ -132,15 +129,15 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
           >
             <div>
               <div className="text-3xl font-bold font-display text-white">120+</div>
-              <div className="text-xs text-slate-500 mt-1 uppercase tracking-wider">Early SkillSyncers</div>
+              <div className="text-xs text-slate-500 mt-1 uppercase tracking-wider text-white">Early SkillSyncers</div>
             </div>
             <div>
               <div className="text-3xl font-bold font-display text-white">480+</div>
-              <div className="text-xs text-slate-500 mt-1 uppercase tracking-wider">Skill Matches</div>
+              <div className="text-xs text-slate-500 mt-1 uppercase tracking-wider text-white">Skill Matches</div>
             </div>
             <div>
               <div className="text-3xl font-bold font-display text-white">88%</div>
-              <div className="text-xs text-slate-500 mt-1 uppercase tracking-wider">Positive Feedback</div>
+              <div className="text-xs text-slate-500 mt-1 uppercase tracking-wider text-white">Positive Feedback</div>
             </div>
           </motion.div>
         </div>
@@ -153,68 +150,13 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
           className="flex-1 relative w-full max-w-xl lg:max-w-none flex items-center justify-center"
         >
 
-          <div className="absolute top-[-20px] right-4 bg-brand-card/90 glass-panel border border-brand-primary/40 px-3 py-1.5 rounded-full flex items-center gap-2 shadow-2xl animate-bounce">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-ping" />
-            <span className="text-[11px] font-mono font-medium text-brand-primary-hover flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-yellow-400" /> Syncy AI Online
-            </span>
-          </div>
-
-          <div className="w-full bg-gradient-to-b from-brand-card to-brand-bg rounded-[2rem] border border-brand-border p-6 shadow-2xl relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-tr from-brand-primary/10 via-brand-secondary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
-            <div className="flex items-center justify-between border-b border-brand-border/50 pb-4 mb-6">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-red-500/80" />
-                <span className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                <span className="w-3 h-3 rounded-full bg-green-500/80" />
-              </div>
-              <span className="text-xs font-mono text-slate-500 bg-brand-sec-bg px-2.5 py-1 rounded-md border border-brand-border/30">
-                syncy.core
-              </span>
-            </div>
-
-            <div className="relative flex flex-col items-center justify-center py-4">
-              <div className="relative mb-6 flex h-40 w-40 items-center justify-center rounded-full border border-brand-primary/30 bg-gradient-to-br from-brand-primary via-brand-secondary to-brand-accent shadow-[0_0_70px_rgba(88,101,242,0.25)]">
-                <div className="absolute inset-3 rounded-full border border-white/20" />
-                <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.35),transparent_45%)]" />
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-bg/80 shadow-inner">
-                  <Sparkles className="h-8 w-8 text-yellow-300" />
-                </div>
-              </div>
-
-              <div className="absolute left-2 top-8 rounded-full border border-brand-border/60 bg-brand-card/90 px-3 py-1 text-[10px] font-semibold text-slate-200 shadow-lg">
-                Share a skill
-              </div>
-              <div className="absolute right-2 top-20 rounded-full border border-brand-border/60 bg-brand-card/90 px-3 py-1 text-[10px] font-semibold text-slate-200 shadow-lg">
-                Learn something new
-              </div>
-              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-brand-border/60 bg-brand-card/90 px-4 py-2 text-[11px] font-semibold text-brand-primary-hover shadow-lg">
-                Smartly matched in seconds
-              </div>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl border border-brand-border/50 bg-brand-sec-bg/70 px-3 py-3 text-center">
-                <div className="text-[10px] font-mono uppercase tracking-[0.25em] text-slate-500">Teach</div>
-                <div className="mt-1 text-sm font-semibold text-slate-100">React</div>
-              </div>
-              <div className="rounded-2xl border border-brand-border/50 bg-brand-sec-bg/70 px-3 py-3 text-center">
-                <div className="text-[10px] font-mono uppercase tracking-[0.25em] text-slate-500">Learn</div>
-                <div className="mt-1 text-sm font-semibold text-slate-100">Design</div>
-              </div>
-              <div className="rounded-2xl border border-brand-border/50 bg-brand-sec-bg/70 px-3 py-3 text-center">
-                <div className="text-[10px] font-mono uppercase tracking-[0.25em] text-slate-500">Grow</div>
-                <div className="mt-1 text-sm font-semibold text-slate-100">Together</div>
-              </div>
-            </div>
-          </div>
+          
         </motion.div>
       </header>
 
 
-      <section id="how-it-works" className="py-24 bg-brand-sec-bg border-y border-brand-border/60 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(88,101,242,0.16),transparent_45%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.16),transparent_40%)]" />
+      <section id="how-it-works" className="py-24 bg-brand-sec-bg/50 border-y border-brand-border/60 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.16),transparent_45%),radial-gradient(circle_at_bottom_right,rgba(250,204,21,0.16),transparent_40%)]" />
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center space-y-4 max-w-2xl mx-auto mb-16">
             <h2 className="text-xs font-bold tracking-[0.35em] text-brand-primary-hover uppercase">Sync Pipeline</h2>
@@ -297,7 +239,9 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
       </section>
 
 
-      <section id="popular-skills" className="py-24 max-w-7xl mx-auto px-6">
+      <section id="popular-skills" className="relative overflow-hidden py-24 max-w-7xl mx-auto px-6">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.14),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(250,204,21,0.12),transparent_40%)]" />
+        <div className="relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div className="space-y-4 max-w-2xl">
             <h2 className="text-xs font-bold tracking-[0.35em] text-brand-accent uppercase">Skill Directory</h2>
@@ -383,11 +327,12 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
                     </button>
                   </div>
                 )}
+        </div>
               </section>
 
 
-              <section id="features" className="relative py-24 border-t border-brand-border/40 bg-brand-sec-bg">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(88,101,242,0.12),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.12),transparent_35%)]" />
+              <section id="features" className="relative py-24 border-t border-brand-border/40 bg-brand-sec-bg/50 overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.12),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(250,204,21,0.12),transparent_35%)]" />
                 <div className="relative z-10 mx-auto max-w-7xl px-6">
 
                   <div className="mx-auto mb-20 max-w-2xl text-center space-y-4">
@@ -396,7 +341,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
                     <p className="text-slate-400">Everything is made to feel easy, trusted, and useful from the first interaction.</p>
                   </div>
 
-                  <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                <div className="relative z-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
 
 
                     <motion.div
@@ -409,7 +354,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/12 via-transparent to-transparent opacity-0 transition-all duration-500 group-hover:opacity-100" />
                       <div className="relative">
-                        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 shadow-lg shadow-indigo-500/10">
+                        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl border border-sky-500/20 bg-sky-500/10 text-sky-400 shadow-lg shadow-sky-500/10">
                           <Zap className="h-6 w-6" />
                         </div>
                         <h4 className="mb-3 text-xl font-bold text-slate-200">Smart Compatibility Matrix</h4>
@@ -431,7 +376,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-brand-secondary/12 via-transparent to-transparent opacity-0 transition-all duration-500 group-hover:opacity-100" />
                       <div className="relative">
-                        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl border border-purple-500/20 bg-purple-500/10 text-purple-400 shadow-lg shadow-purple-500/10">
+                        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10 text-blue-400 shadow-lg shadow-blue-500/10">
                           <Sparkles className="h-6 w-6" />
                         </div>
                         <h4 className="mb-3 text-xl font-bold text-slate-200">Syncy AI Career Mentor</h4>
@@ -451,9 +396,9 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
                       transition={{ duration: 0.3, delay: 0.08 }}
                       className="group relative flex h-full flex-col justify-between overflow-hidden rounded-[1.6rem] border border-brand-border/60 bg-gradient-to-br from-brand-card/85 via-brand-card/65 to-brand-sec-bg/80 p-8 shadow-[0_20px_60px_rgba(2,6,23,0.3)]"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/12 via-transparent to-transparent opacity-0 transition-all duration-500 group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/12 via-transparent to-transparent opacity-0 transition-all duration-500 group-hover:opacity-100" />
                       <div className="relative">
-                        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 shadow-lg shadow-emerald-500/10">
+                        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-500/20 bg-cyan-500/10 text-cyan-400 shadow-lg shadow-cyan-500/10">
                           <MessageSquare className="h-6 w-6" />
                         </div>
                         <h4 className="mb-3 text-xl font-bold text-slate-200">Modern Messaging</h4>
@@ -461,7 +406,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
                           Talk with your match in a simple, fast space built for quick ideas, feedback, and follow-up.
                         </p>
                       </div>
-                      <span className="relative mt-6 inline-flex items-center gap-1 text-xs font-mono text-emerald-400">P2P Safe Chats</span>
+                      <span className="relative mt-6 inline-flex items-center gap-1 text-xs font-mono text-cyan-400">P2P Safe Chats</span>
                     </motion.div>
 
                     <motion.div
@@ -472,9 +417,9 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
                       transition={{ duration: 0.3, delay: 0.12 }}
                       className="group relative flex h-full flex-col justify-between overflow-hidden rounded-[1.6rem] border border-brand-border/60 bg-gradient-to-br from-brand-card/85 via-brand-card/65 to-brand-sec-bg/80 p-8 shadow-[0_20px_60px_rgba(2,6,23,0.3)]"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-red-500/12 via-transparent to-transparent opacity-0 transition-all duration-500 group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-sky-500/12 via-transparent to-transparent opacity-0 transition-all duration-500 group-hover:opacity-100" />
                       <div className="relative">
-                        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl border border-red-500/20 bg-red-500/10 text-red-400 shadow-lg shadow-red-500/10">
+                        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl border border-sky-500/20 bg-sky-500/10 text-sky-400 shadow-lg shadow-sky-500/10">
                           <CheckCircle className="h-6 w-6" />
                         </div>
                         <h4 className="mb-3 text-xl font-bold text-slate-200">Easy Onboarding</h4>
@@ -482,7 +427,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
                           Set up your profile and start connecting in a few simple steps without feeling overwhelmed.
                         </p>
                       </div>
-                      <span className="relative mt-6 inline-flex items-center gap-1 text-xs font-mono text-red-400">3-Step Easy Flow</span>
+                      <span className="relative mt-6 inline-flex items-center gap-1 text-xs font-mono text-sky-400">3-Step Easy Flow</span>
                     </motion.div>
 
 
@@ -494,9 +439,9 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
                       transition={{ duration: 0.3, delay: 0.16 }}
                       className="group relative flex h-full flex-col justify-between overflow-hidden rounded-[1.6rem] border border-brand-border/60 bg-gradient-to-br from-brand-card/85 via-brand-card/65 to-brand-sec-bg/80 p-8 shadow-[0_20px_60px_rgba(2,6,23,0.3)]"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/12 via-transparent to-transparent opacity-0 transition-all duration-500 group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/12 via-transparent to-transparent opacity-0 transition-all duration-500 group-hover:opacity-100" />
                       <div className="relative">
-                        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-500/20 bg-amber-500/10 text-amber-400 shadow-lg shadow-amber-500/10">
+                        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl border border-yellow-500/20 bg-yellow-500/10 text-yellow-400 shadow-lg shadow-yellow-500/10">
                           <Shield className="h-6 w-6" />
                         </div>
                         <h4 className="mb-3 text-xl font-bold text-slate-200">Trusted Reviews</h4>
@@ -504,7 +449,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
                           Build confidence through feedback, recognition, and visible reputation over time.
                         </p>
                       </div>
-                      <span className="relative mt-6 inline-flex items-center gap-1 text-xs font-mono text-amber-400">Review Framework</span>
+                      <span className="relative mt-6 inline-flex items-center gap-1 text-xs font-mono text-yellow-400">Review Framework</span>
                     </motion.div>
 
 
@@ -516,9 +461,9 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
                       transition={{ duration: 0.3, delay: 0.2 }}
                       className="group relative flex h-full flex-col justify-between overflow-hidden rounded-[1.6rem] border border-brand-border/60 bg-gradient-to-br from-brand-card/85 via-brand-card/65 to-brand-sec-bg/80 p-8 shadow-[0_20px_60px_rgba(2,6,23,0.3)]"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-pink-500/12 via-transparent to-transparent opacity-0 transition-all duration-500 group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/12 via-transparent to-transparent opacity-0 transition-all duration-500 group-hover:opacity-100" />
                       <div className="relative">
-                        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl border border-pink-500/20 bg-pink-500/10 text-pink-400 shadow-lg shadow-pink-500/10">
+                        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10 text-blue-400 shadow-lg shadow-blue-500/10">
                           <Award className="h-6 w-6" />
                         </div>
                         <h4 className="mb-3 text-xl font-bold text-slate-200">Freemium Growth Path</h4>
@@ -526,15 +471,16 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
                           Start free, unlock more value as you grow, and keep the experience flexible for every stage.
                         </p>
                       </div>
-                      <span className="relative mt-6 inline-flex items-center gap-1 text-xs font-mono text-pink-400">Freemium Swapping</span>
+                      <span className="relative mt-6 inline-flex items-center gap-1 text-xs font-mono text-blue-400">Freemium Swapping</span>
                     </motion.div>
 
                   </div>
                 </div>
               </section>
 
-              <section id="testimonials" className="mx-auto max-w-7xl px-6 py-24">
-                <div className="mx-auto mb-16 max-w-2xl text-center space-y-4">
+              <section id="testimonials" className="relative overflow-hidden mx-auto max-w-7xl px-6 py-24">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(56,189,248,0.12),transparent_55%),radial-gradient(circle_at_50%_100%,rgba(250,204,21,0.1),transparent_50%)]" />
+                <div className="relative z-10 mx-auto mb-16 max-w-2xl text-center space-y-4">
                   <h2 className="text-xs font-bold uppercase tracking-[0.35em] text-brand-primary">SkillSyncer Stories</h2>
                   <h3 className="text-3xl font-bold font-display text-white md:text-4xl">Loved by Students from Top Indian Colleges</h3>
                   <p className="text-slate-400">These are honest stories from students who used SkillSync to learn faster, share smarter, and build real confidence.</p>
@@ -630,7 +576,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
 
               <section className="relative z-10 mx-auto max-w-7xl px-6 py-24">
                 <div className="relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-brand-border/80 bg-gradient-to-r from-brand-primary/25 via-brand-secondary/15 to-brand-accent/15 p-10 text-center shadow-[0_30px_80px_rgba(2,6,23,0.35)] md:p-16">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(88,101,242,0.2),transparent_70%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(56,189,248,0.2),transparent_70%)]" />
                   <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.06),transparent_45%,rgba(255,255,255,0.03))]" />
                   <div className="relative z-10">
                     <h2 className="mb-6 text-3xl font-bold font-display leading-tight tracking-tight text-white md:text-5xl">
@@ -643,7 +589,7 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
                       <button
                         id="btn-cta-signup"
                         onClick={() => onStartAuth("signup")}
-                        className="w-full rounded-2xl bg-gradient-to-r from-brand-primary to-brand-secondary px-8 py-4 font-bold text-white shadow-[0_18px_40px_rgba(88,101,242,0.25)] transition-all hover:scale-[1.02] hover:shadow-[0_20px_45px_rgba(88,101,242,0.35)] sm:w-auto cursor-pointer"
+                        className="w-full rounded-2xl bg-gradient-to-r from-brand-primary to-brand-secondary px-8 py-4 font-bold text-white shadow-[0_18px_40px_rgba(56,189,248,0.25)] transition-all hover:scale-[1.02] hover:shadow-[0_20px_45px_rgba(56,189,248,0.35)] sm:w-auto cursor-pointer"
                       >
                         Sign Up Now
                       </button>
@@ -654,8 +600,8 @@ export default function LandingPage({ onStartAuth, onExploreDemo }: LandingPageP
               </section>
 
               {/* Footer */ }
-            < footer className = "relative z-10 border-t border-brand-border/40 bg-brand-bg/80 py-12" >
-            <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-6 text-sm text-slate-500 md:flex-row">
+            < footer className = "relative z-10 border-t border-brand-border/40 bg-brand-bg/60 py-12" >
+            <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-6 text-sm text-slate-500 md:flex-row">
 
               <div className="flex items-center space-x-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-tr from-brand-primary to-brand-accent shadow-lg shadow-brand-primary/20">

@@ -247,7 +247,6 @@ export default function Onboarding({
       rating: 5.0,
       reviewsCount: 0,
       achievements: ["Early Adopter"],
-      location: "San Francisco, CA",
     };
 
     onComplete(profile);
@@ -497,7 +496,7 @@ export default function Onboarding({
 
                   
                   <div className="space-y-2.5">
-                    <label className="text-xs font-semibold text-purple-400">Skills Wanted (Skills you want to learn)</label>
+                    <label className="text-xs font-semibold text-sky-400">Skills Wanted (Skills you want to learn)</label>
                     <div className="max-h-56 space-y-3 overflow-y-auto rounded-2xl border border-brand-border/40 bg-brand-bg/50 p-2.5">
                       {skillGroups.map((group) => {
                         const groupSkills = POPULAR_SKILLS.filter(skill => skill.category === group);
@@ -513,11 +512,11 @@ export default function Onboarding({
                                     onClick={() => toggleSkillWanted(skill.name)}
                                     className={`flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${
                                       isSelected 
-                                        ? "border-purple-500/40 bg-purple-500/20 text-purple-300 shadow-sm"
+                                        ? "border-sky-500/40 bg-sky-500/20 text-sky-300 shadow-sm"
                                         : "border-brand-border/50 bg-brand-bg text-slate-400 hover:text-white"
                                     }`}
                                   >
-                                    {isSelected && <Check className="h-3 w-3 text-purple-400" />} {skill.name}
+                                    {isSelected && <Check className="h-3 w-3 text-sky-400" />} {skill.name}
                                   </button>
                                 );
                               })}
@@ -540,12 +539,12 @@ export default function Onboarding({
                         }
                       }}
                       placeholder="Type a custom skill you want to learn..."
-                      className="flex-1 px-3 py-2 rounded-lg bg-brand-bg border border-brand-border focus:border-purple-500/50 focus:outline-none text-xs text-slate-200 placeholder:text-slate-600 transition-colors"
+                      className="flex-1 px-3 py-2 rounded-lg bg-brand-bg border border-brand-border focus:border-sky-500/50 focus:outline-none text-xs text-slate-200 placeholder:text-slate-600 transition-colors"
                     />
                     <button
                       type="button"
                       onClick={() => addCustomSkill("wanted")}
-                      className="px-3.5 py-2 rounded-lg text-xs font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30 hover:bg-purple-500/25 transition-colors"
+                      className="px-3.5 py-2 rounded-lg text-xs font-bold bg-sky-500/15 text-sky-300 border border-sky-500/30 hover:bg-sky-500/25 transition-colors"
                     >
                       Add Skill
                     </button>
@@ -554,13 +553,13 @@ export default function Onboarding({
                   {customWantedSkills.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
                       {customWantedSkills.map(skill => (
-                        <span key={skill} className="flex items-center gap-1 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/40 px-2.5 py-1 text-xs font-semibold">
+                        <span key={skill} className="flex items-center gap-1 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/40 px-2.5 py-1 text-xs font-semibold">
                           {skill}
                           <button
                             type="button"
                             onClick={() => removeCustomSkill("wanted", skill)}
                             aria-label={`Remove ${skill}`}
-                            className="text-purple-300/60 hover:text-red-400 transition-colors"
+                            className="text-sky-300/60 hover:text-red-400 transition-colors"
                           >
                             <X className="w-3 h-3" />
                           </button>
@@ -718,7 +717,7 @@ export default function Onboarding({
                 type="button"
                 id="btn-onboarding-complete"
                 onClick={handleSubmit}
-                className="px-6 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center gap-1.5 shadow-md shadow-emerald-500/10 transition-all cursor-pointer"
+                className="px-6 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-tr from-emerald-500 to-teal-500 text-white keep-light-text flex items-center gap-1.5 shadow-md shadow-emerald-500/10 transition-all cursor-pointer"
               >
                 {isEdit ? "Save Changes" : "Complete Onboarding"} <Check className="w-3.5 h-3.5" />
               </button>
