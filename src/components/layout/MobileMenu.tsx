@@ -1,5 +1,6 @@
-import { X, Sparkles } from "lucide-react";
+import { X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import skillsyncLogo from "../../../assets/skillsyncLogo.png";
 
 interface MobileMenuProps {
   activeTab: string;
@@ -32,12 +33,11 @@ export default function MobileMenu({ activeTab, onNavigate, onClose, onLogout }:
         <div className="absolute bottom-0 -left-24 w-72 h-72 rounded-full bg-brand-accent/10 blur-3xl pointer-events-none" />
 
         <div className="relative flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-tr from-brand-primary to-brand-accent shadow-lg shadow-brand-primary/25">
-              <Sparkles className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-xl font-bold text-white font-display">SkillSync</span>
-          </div>
+          <img
+            src={skillsyncLogo}
+            alt="SkillSync"
+            className="h-9 w-auto object-contain drop-shadow-[0_0_12px_rgba(56,189,248,0.3)]"
+          />
           <button
             onClick={onClose}
             className="text-slate-400 hover:text-white transition-colors w-9 h-9 rounded-xl border border-brand-border/50 flex items-center justify-center hover:bg-brand-card/50 cursor-pointer"

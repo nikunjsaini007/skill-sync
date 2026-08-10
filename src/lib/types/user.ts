@@ -42,6 +42,7 @@ export interface Message {
   connectionId: string;
   senderId: string;
   text: string;
+  imageUrls?: string[];
   createdAt: string;
   read: boolean;
 }

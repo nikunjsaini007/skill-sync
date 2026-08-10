@@ -152,7 +152,7 @@ export default function Support() {
           {submitted && (
             <div className="mb-5 p-4 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-xs flex items-center gap-2.5">
               <CheckCircle className="w-4 h-4 shrink-0" />
-              <span>Thanks {form.name || "there"}! Your ticket was sent. We'll reply shortly.</span>
+              <span>Thanks {submitted}! Your ticket was sent. We'll reply shortly.</span>
             </div>
           )}
 

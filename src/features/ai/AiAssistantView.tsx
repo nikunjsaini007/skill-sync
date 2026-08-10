@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Sparkles, Send, Brain, Compass, BookOpen, FileText, Bot, RefreshCw, Star, Check } from "lucide-react";
+import { Sparkles, Send, Brain, Compass, BookOpen, FileText, RefreshCw, Star, Check } from "lucide-react";
 import { UserProfile } from "@/lib/types";
+import syncyAvatar from "../../../assets/syncy.png";
 
 interface AiAssistantViewProps {
   currentUser: UserProfile;
@@ -161,8 +162,8 @@ export default function AiAssistantView({ currentUser }: AiAssistantViewProps) {
 
       <div className="p-4 border-b border-brand-border/40 flex items-center justify-between shrink-0 bg-brand-sec-bg/15">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-primary to-brand-accent flex items-center justify-center shadow-lg shadow-brand-accent/10">
-            <Sparkles className="w-5 h-5 text-white animate-pulse" />
+          <div className="w-10 h-10 rounded-full overflow-hidden border border-brand-primary/30 shadow-lg shadow-brand-accent/10">
+            <img src={syncyAvatar} alt="Syncy" className="w-full h-full object-cover" />
           </div>
           <div>
             <h1 className="text-sm font-bold text-slate-100 flex items-center gap-1">
@@ -180,16 +181,20 @@ export default function AiAssistantView({ currentUser }: AiAssistantViewProps) {
           <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={`flex gap-3 max-w-2xl ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
 
-              <div className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-white border ${msg.role === "user"
+              <div className={`w-8 h-8 rounded-full shrink-0 overflow-hidden flex items-center justify-center text-white border ${msg.role === "user"
                 ? "bg-brand-secondary/20 border-brand-secondary/30"
-                : "bg-gradient-to-tr from-brand-primary to-brand-accent border-brand-primary/30"
+                : "border-brand-primary/30"
                 }`}>
-                {msg.role === "user" ? currentUser.name[0] : <Bot className="w-4.5 h-4.5 text-white" />}
+                {msg.role === "user" ? (
+                  <span className="text-xs font-bold">{currentUser.name[0]}</span>
+                ) : (
+                  <img src={syncyAvatar} alt="Syncy" className="w-full h-full object-cover" />
+                )}
               </div>
 
 
               <div className={`p-4 rounded-2xl shadow-md ${msg.role === "user"
-                ? "bg-brand-primary text-white rounded-tr-none"
+                ? "bg-gradient-to-tr from-blue-700 to-sky-800 text-white rounded-tr-none"
                 : "bg-brand-card/85 border border-brand-border text-slate-200 rounded-tl-none"
                 }`}>
                 {msg.role === "user" ? (

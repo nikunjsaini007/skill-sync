@@ -20,7 +20,7 @@ export async function createFirebaseAccount(name: string, email: string, passwor
 export async function getFirebaseProfile(uid: string, fallbackName: string, email: string) {
   if (!db) throw new Error("Firebase is not configured.");
   const reference = doc(db, "users", uid); const snapshot = await getDoc(reference);
-  if (snapshot.exists()) return snapshot.data() as UserProfile;
+  if (snapshot.exists()) return { ...(snapshot.data() as UserProfile), id: uid };
   const profile = defaultProfile(uid, fallbackName || "SkillSyncer", email);
   await setDoc(reference, profile); return profile;
 }

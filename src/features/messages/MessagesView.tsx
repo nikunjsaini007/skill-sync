@@ -1,10 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { motion } from "motion/react";
-import { MessageSquare, Send, CheckCheck, Smile, HelpCircle, Sparkles, Brain, Code, Zap, Phone, Video } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { MessageSquare, Send, CheckCheck, Smile, HelpCircle, Sparkles, Brain, Code, Zap, Phone, Video, Image as ImageIcon, Plus, X, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { UserProfile, Connection, Message } from "@/lib/types";
-import { Image } from "lucide-react";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "@/services/firebase";
 import { useCalls } from "@/features/calls";
 
 interface MessagesViewProps {
@@ -14,8 +11,14 @@ interface MessagesViewProps {
   users: UserProfile[];
   activeChatPeerId: string | null;
   setActiveChatPeerId: (id: string | null) => void;
-  onSendMessage: (receiverId: string, text: string) => void;
+  onSendMessage: (receiverId: string, text: string, imageUrls?: string[]) => void;
 }
+
+const MAX_IMAGES = 5;
+const MAX_IMAGE_SIZE_MB = 8;
+// Firestore caps a message document at ~1MB, so keep each compressed image
+// well under that budget (base64 inflates the raw bytes by ~33%).
+const MAX_DATA_URL_LENGTH = 160_000;
 
 export default function MessagesView({
   currentUser,
@@ -27,12 +30,67 @@ export default function MessagesView({
   onSendMessage
 }: MessagesViewProps) {
 
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedImages, setSelectedImages] = useState<{ file: File; preview: string }[]>([]);
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [pickerMessage, setPickerMessage] = useState<string | null>(null);
+  const [viewer, setViewer] = useState<{
+    urls: string[];
+    index: number;
+    senderName: string;
+    senderAvatar: string;
+    caption: string;
+    createdAt: string;
+  } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const { activeCall, startCall } = useCalls();
+  const selectedImagesRef = useRef(selectedImages);
+  selectedImagesRef.current = selectedImages;
+
+  useEffect(() => {
+    return () => {
+      selectedImagesRef.current.forEach(img => URL.revokeObjectURL(img.preview));
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!pickerMessage) return;
+    const timer = setTimeout(() => setPickerMessage(null), 3500);
+    return () => clearTimeout(timer);
+  }, [pickerMessage]);
+
+  useEffect(() => {
+    if (!viewer) return;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setViewer(null);
+      if (e.key === "ArrowLeft") setViewer(v => v && v.urls.length > 1 ? { ...v, index: (v.index - 1 + v.urls.length) % v.urls.length } : v);
+      if (e.key === "ArrowRight") setViewer(v => v && v.urls.length > 1 ? { ...v, index: (v.index + 1) % v.urls.length } : v);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [viewer]);
+
+  const openImageViewer = (
+    urls: string[],
+    index: number,
+    senderName: string,
+    senderAvatar: string,
+    caption: string,
+    createdAt: string
+  ) => {
+    setViewer({ urls, index, senderName, senderAvatar, caption, createdAt });
+  };
+
+  const stepViewer = (dir: 1 | -1) => {
+    setViewer(v => (v && v.urls.length > 1
+      ? { ...v, index: (v.index + dir + v.urls.length) % v.urls.length }
+      : v));
+  };
 
 
   const activeConns = connections.filter(
@@ -114,48 +172,102 @@ export default function MessagesView({
     return () => clearTimeout(timer);
   }, [activeChatMessages.length, activeChatPeerId, isTyping]);
 
-  const uploadImage = async (file: File) => {
-    if (!storage) {
-      throw new Error("Storage is not initialized");
+  const compressImage = async (file: File): Promise<string> => {
+    const rawDataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(new Error("Could not read the selected image."));
+      reader.readAsDataURL(file);
+    });
+
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("Could not decode the selected image."));
+      img.src = rawDataUrl;
+    });
+
+    let width = image.naturalWidth || image.width;
+    let height = image.naturalHeight || image.height;
+    const scale = Math.min(1, 900 / Math.max(width, height));
+    width = Math.max(1, Math.round(width * scale));
+    height = Math.max(1, Math.round(height * scale));
+    let quality = 0.72;
+
+    for (let attempt = 0; attempt < 8; attempt++) {
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Image compression is not supported in this browser.");
+      ctx.drawImage(image, 0, 0, width, height);
+      const dataUrl = canvas.toDataURL("image/jpeg", quality);
+      if (dataUrl.length <= MAX_DATA_URL_LENGTH) return dataUrl;
+      if (attempt % 2 === 0) {
+        quality = Math.max(0.35, quality - 0.12);
+      } else {
+        width = Math.max(64, Math.round(width * 0.8));
+        height = Math.max(64, Math.round(height * 0.8));
+      }
     }
-
-    const imageRef = ref(
-      storage,
-      `chat-images/${Date.now()}-${file.name}`
-    );
-
-    await uploadBytes(imageRef, file);
-
-    const downloadURL = await getDownloadURL(imageRef);
-
-    return downloadURL;
+    throw new Error("This image is too large to share. Please choose a smaller one.");
   };
 
 
 
   const handleSend = async () => {
-
-    let imageUrl = "";
-
-    if (selectedImage) {
-      imageUrl = await uploadImage(selectedImage);
-    } 
-    if (!inputText.trim() || !activeChatPeerId) return;
     const textToSend = inputText.trim();
-    onSendMessage(activeChatPeerId, textToSend);
-    setInputText("");
+    if ((!textToSend && selectedImages.length === 0) || !activeChatPeerId || isSending) return;
 
+    setIsSending(true);
+    try {
+      let imageUrls: string[] = [];
+      if (selectedImages.length > 0) {
+        imageUrls = await Promise.all(selectedImages.map(img => compressImage(img.file)));
+      }
+      onSendMessage(activeChatPeerId, textToSend, imageUrls);
+      setInputText("");
+      selectedImages.forEach(img => URL.revokeObjectURL(img.preview));
+      setSelectedImages([]);
+    } catch (error) {
+      setPickerMessage(error instanceof Error ? error.message : "Image upload failed. Please try again.");
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleImageSelect = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const file = e.target.files?.[0];
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
-    if (!file) return;
+    if (selectedImages.length + files.length > MAX_IMAGES) {
+      setPickerMessage(`You can attach up to ${MAX_IMAGES} images.`);
+    }
 
-    setSelectedImage(file);
-    setImagePreview(URL.createObjectURL(file));
+    const next: { file: File; preview: string }[] = [];
+    for (const file of files) {
+      if (selectedImages.length + next.length >= MAX_IMAGES) break;
+      if (!file.type.startsWith("image/")) continue;
+      if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
+        setPickerMessage(`${file.name} is larger than ${MAX_IMAGE_SIZE_MB}MB and was skipped.`);
+        continue;
+      }
+      next.push({ file, preview: URL.createObjectURL(file) });
+    }
+
+    if (next.length > 0) {
+      setPickerMessage(null);
+      setSelectedImages(prev => [...prev, ...next]);
+    }
+    e.target.value = "";
+  };
+
+  const removeImage = (index: number) => {
+    const target = selectedImages[index];
+    if (target) URL.revokeObjectURL(target.preview);
+    setSelectedImages(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -169,6 +281,7 @@ export default function MessagesView({
   ] : [];
 
   return (
+    <>
     <div id="messages-view" className="flex h-[calc(100vh-64px)] md:h-screen font-sans border-l border-brand-border/20">
 
 
@@ -208,7 +321,13 @@ export default function MessagesView({
                     <p className="text-[10px] text-slate-500 truncate mt-0.5">{partner.peer.college}</p>
                     {partner.lastMsg ? (
                       <p className="text-[10px] text-slate-400 truncate mt-1">
-                        {partner.lastMsg.senderId === currentUser.id ? "You: " : ""}{partner.lastMsg.text}
+                        {partner.lastMsg.senderId === currentUser.id ? "You: " : ""}
+                        {partner.lastMsg.text ||
+                          (partner.lastMsg.imageUrls && partner.lastMsg.imageUrls.length > 0
+                            ? partner.lastMsg.imageUrls.length === 1
+                              ? "Shared a photo"
+                              : `Shared ${partner.lastMsg.imageUrls.length} photos`
+                            : "")}
                       </p>
                     ) : (
                       <p className="text-[10px] text-brand-primary-hover font-medium truncate mt-1">
@@ -317,13 +436,39 @@ export default function MessagesView({
 
               {activeChatMessages.map(msg => {
                 const isMine = msg.senderId === currentUser.id;
+                const msgImages = msg.imageUrls ?? [];
+                const singleImage = msgImages.length === 1;
+                const msgSender = isMine ? currentUser : activePeer;
                 return (
                   <div key={msg.id} className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-md p-3.5 rounded-2xl text-xs space-y-1 shadow-md ${isMine
-                      ? "bg-brand-primary text-white rounded-tr-none"
+                    <div className={`max-w-md p-3.5 rounded-2xl text-xs space-y-1.5 shadow-md ${isMine
+                      ? "bg-gradient-to-tr from-blue-700 to-sky-800 text-white rounded-tr-none"
                       : "bg-brand-card border border-brand-border text-slate-200 rounded-tl-none"
                       }`}>
-                      <p className="leading-relaxed whitespace-pre-wrap">{msg.text}</p>
+                      {msgImages.length > 0 && (
+                        <div className={singleImage ? "grid grid-cols-1 gap-1.5" : "grid grid-cols-2 gap-1.5"}>
+                          {msgImages.map((url, i) => (
+                            <button
+                              key={i}
+                              onClick={() => openImageViewer(
+                                msgImages,
+                                i,
+                                msgSender?.name || "Swapper Peer",
+                                msgSender?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80",
+                                msg.text,
+                                msg.createdAt
+                              )}
+                              title="View image"
+                              className={singleImage
+                                ? "block w-full max-h-72 overflow-hidden rounded-xl border border-white/10 bg-black/20 group cursor-pointer"
+                                : "block w-36 h-36 overflow-hidden rounded-lg border border-white/10 bg-black/20 group cursor-pointer"}
+                            >
+                              <img src={url} alt={`Shared image ${i + 1}`} loading="lazy" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {msg.text && <p className="leading-relaxed whitespace-pre-wrap">{msg.text}</p>}
                       <div className="flex items-center justify-end gap-1 text-[9px] opacity-60">
                         <span>
                           {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -350,22 +495,49 @@ export default function MessagesView({
               <div ref={messagesEndRef} />
             </div>
 
-            {selectedImage && (
+            {selectedImages.length > 0 && (
               <div className="px-4 pb-2">
-                <div className="relative inline-block">
-                  <img
-                    src={imagePreview!}
-                    alt="Preview"
-                    className="w-32 h-32 object-cover rounded-xl border border-brand-border"
-                  />
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="rounded-2xl border border-brand-border/60 bg-gradient-to-br from-brand-card/90 via-brand-card/70 to-brand-sec-bg/90 p-3 shadow-[0_16px_40px_rgba(2,6,23,0.3)] soft-3d"
+                >
+                  <div className="flex items-center justify-between mb-2.5">
+                    <span className="text-[10px] font-semibold text-slate-300 flex items-center gap-1.5">
+                      <ImageIcon className="w-3.5 h-3.5 text-brand-primary" />
+                      Add to your swap
+                    </span>
+                    <span className="text-[9px] font-mono text-brand-primary-hover">{selectedImages.length}/{MAX_IMAGES}</span>
+                  </div>
 
-                  <button
-                    onClick={() => setSelectedImage(null)}
-                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white keep-light-text flex items-center justify-center hover:bg-red-600"
-                  >
-                    ✕
-                  </button>
-                </div>
+                  <div className="flex gap-2.5 overflow-x-auto pb-1">
+                    {selectedImages.map((img, index) => (
+                      <div key={index} className="relative group shrink-0">
+                        <div className="w-20 h-20 md:w-24 md:h-24 overflow-hidden rounded-xl border border-brand-border/60 shadow-lg">
+                          <img src={img.preview} alt={`Selected image ${index + 1}`} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                        </div>
+                        <button
+                          onClick={() => removeImage(index)}
+                          aria-label="Remove image"
+                          className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-500 text-white keep-light-text flex items-center justify-center hover:bg-red-600 hover:scale-110 transition-all shadow"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+
+                    {selectedImages.length < MAX_IMAGES && (
+                      <label
+                        htmlFor="image-upload"
+                        className="w-20 h-20 md:w-24 md:h-24 shrink-0 rounded-xl border-2 border-dashed border-brand-primary/40 hover:border-brand-primary hover:bg-brand-primary/5 flex flex-col items-center justify-center gap-1 cursor-pointer text-brand-primary-hover transition-colors"
+                      >
+                        <Plus className="w-5 h-5" />
+                        <span className="text-[8px] font-semibold">Add Photo</span>
+                      </label>
+                    )}
+                  </div>
+                </motion.div>
               </div>
             )}
             <div className="p-4 border-t border-brand-border/40 bg-brand-sec-bg/25">
@@ -373,9 +545,16 @@ export default function MessagesView({
                 id="image-upload"
                 type="file"
                 accept="image/*"
+                multiple
                 onChange={handleImageSelect}
                 className="hidden"
               />
+              {pickerMessage && (
+                <div className="mb-2 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/25 text-[10px] text-red-400 flex items-center gap-1.5">
+                  <HelpCircle className="w-3 h-3 shrink-0" />
+                  <span>{pickerMessage}</span>
+                </div>
+              )}
               <div className="flex items-center gap-2 bg-brand-bg rounded-xl border border-brand-border/80 px-3.5 py-1 focus-within:border-brand-primary transition-colors">
                 <button className="text-slate-500 hover:text-slate-300 transition-colors shrink-0">
                   <Smile className="w-4.5 h-4.5" />
@@ -383,9 +562,10 @@ export default function MessagesView({
 
                 <label
                   htmlFor="image-upload"
-                  className="cursor-pointer text-slate-500 hover:text-slate-300 transition-colors shrink-0"
+                  className="cursor-pointer text-slate-500 hover:text-brand-primary-hover transition-colors shrink-0"
+                  title={`Attach up to ${MAX_IMAGES} photos`}
                 >
-                  <Image className="w-4.5 h-4.5" />
+                  <ImageIcon className="w-4.5 h-4.5" />
                 </label>
 
                 <input
@@ -401,10 +581,14 @@ export default function MessagesView({
                 <button
                   id="btn-send-message"
                   onClick={handleSend}
-                  disabled={!inputText.trim()}
+                  disabled={(!inputText.trim() && selectedImages.length === 0) || isSending}
                   className="px-3.5 py-1.5 rounded-lg bg-brand-primary hover:bg-brand-primary-hover text-white disabled:opacity-30 disabled:pointer-events-none transition-colors shrink-0 cursor-pointer"
                 >
-                  <Send className="w-3.5 h-3.5" />
+                  {isSending ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Send className="w-3.5 h-3.5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -423,5 +607,90 @@ export default function MessagesView({
       </div>
 
     </div>
+
+      <AnimatePresence>
+        {viewer && (
+          <motion.div
+            key="image-viewer"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-md p-4 md:p-8"
+            onClick={() => setViewer(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.92, y: 14 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.96, y: 8 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="relative w-full max-w-lg md:max-w-xl bg-brand-bg border border-brand-border/60 rounded-2xl overflow-hidden shadow-2xl soft-3d"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3 p-3 border-b border-brand-border/40 bg-brand-card/60">
+                <div className="w-9 h-9 rounded-full overflow-hidden border border-brand-border shrink-0">
+                  <img src={viewer.senderAvatar} alt={viewer.senderName} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold text-slate-200 truncate">{viewer.senderName}</p>
+                  <p className="text-[10px] text-slate-500">
+                    {new Date(viewer.createdAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setViewer(null)}
+                  aria-label="Close image"
+                  className="w-8 h-8 rounded-full hover:bg-brand-bg flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="relative bg-black/40">
+                <motion.img
+                  key={viewer.index}
+                  src={viewer.urls[viewer.index]}
+                  alt={`Shared image ${viewer.index + 1}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.2 }}
+                  className="w-full max-h-[62vh] object-contain"
+                />
+
+                {viewer.urls.length > 1 && (
+                  <>
+                    <button
+                      onClick={e => { e.stopPropagation(); stepViewer(-1); }}
+                      aria-label="Previous image"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur flex items-center justify-center text-white transition-colors"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={e => { e.stopPropagation(); stepViewer(1); }}
+                      aria-label="Next image"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur flex items-center justify-center text-white transition-colors"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                    <div className="absolute top-2 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur text-[10px] font-mono text-white">
+                      {viewer.index + 1}/{viewer.urls.length}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {viewer.caption && (
+                <div className="p-3.5 border-t border-brand-border/40 bg-brand-card/40">
+                  <p className="text-xs text-slate-200 leading-relaxed whitespace-pre-wrap">
+                    <span className="font-bold">{viewer.senderName}</span> {viewer.caption}
+                  </p>
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

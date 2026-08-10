@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import GalaxyField from "@/components/GalaxyField";
+import skillsyncLogo from "../../assets/skillsyncLogo.png";
 
 interface PublicPageShellProps {
   children: ReactNode;
@@ -20,13 +21,12 @@ export default function PublicPageShell({ children }: PublicPageShellProps) {
 
       <nav className="fixed inset-x-0 top-0 z-50 mx-4 mt-4 rounded-full liquid-glass px-4 py-3 md:mx-6 md:px-6">
         <div className="flex items-center justify-between gap-3">
-          <Link to="/" className="flex items-center space-x-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-tr from-brand-primary to-brand-accent shadow-lg shadow-brand-primary/20">
-              <Sparkles className="h-5 w-5 animate-pulse text-white" />
-            </div>
-            <span className="text-xl font-bold font-display tracking-tight bg-gradient-to-r from-white via-slate-200 to-brand-primary-hover bg-clip-text text-transparent md:text-2xl">
-              SkillSync
-            </span>
+          <Link to="/" className="flex items-center">
+            <img
+              src={skillsyncLogo}
+              alt="SkillSync"
+              className="h-9 w-auto object-contain drop-shadow-[0_0_14px_rgba(56,189,248,0.3)] md:h-10"
+            />
           </Link>
 
           <div className="flex items-center gap-2">
@@ -50,11 +50,12 @@ export default function PublicPageShell({ children }: PublicPageShellProps) {
 
       <footer className="relative z-10 border-t border-brand-border/40 bg-brand-bg/60 py-12">
         <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-6 text-sm text-slate-500 md:flex-row">
-          <div className="flex items-center space-x-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-tr from-brand-primary to-brand-accent shadow-lg shadow-brand-primary/20">
-              <Sparkles className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-lg font-bold font-display text-slate-300">SkillSync</span>
+          <div className="flex items-center">
+            <img
+              src={skillsyncLogo}
+              alt="SkillSync"
+              className="h-8 w-auto object-contain drop-shadow-[0_0_10px_rgba(56,189,248,0.2)]"
+            />
           </div>
 
           <p className="text-center text-xs md:text-left">

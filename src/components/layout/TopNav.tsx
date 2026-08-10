@@ -1,5 +1,6 @@
-import { Bell, Menu, Sparkles } from "lucide-react";
+import { Bell, Menu } from "lucide-react";
 import type { Notification, UserProfile } from "@/lib/types";
+import skillsyncLogo from "../../../assets/skillsyncLogo.png";
 
 interface TopNavProps {
   currentUser: UserProfile;
@@ -49,11 +50,12 @@ export default function TopNav({
 
       </div>
 
-      <div className="md:hidden flex items-center space-x-2">
-        <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-brand-primary to-brand-accent flex items-center justify-center">
-          <Sparkles className="w-4 h-4 text-white" />
-        </div>
-        <span className="text-base font-bold text-white font-display">SkillSync</span>
+      <div className="md:hidden flex items-center">
+        <img
+          src={skillsyncLogo}
+          alt="SkillSync"
+          className="h-7 w-auto object-contain drop-shadow-[0_0_10px_rgba(56,189,248,0.25)]"
+        />
       </div>
 
       <div className="flex items-center space-x-4">

@@ -4,7 +4,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import type { Connection, Message, Notification, UserProfile } from "@/lib/types";
 import { CONNECTIONS_KEY, MESSAGES_KEY, NOTIFICATIONS_KEY, THEME_KEY, USER_KEY } from "@/lib/constants";
 import { seedConnections, seedMessages, seedNotifications } from "@/data";
-import { auth, firebaseReady } from "@/services/firebase";
+import { auth, defaultProfile, firebaseReady } from "@/services/firebase";
 import {
   createFirebaseAccount,
   getFirebaseProfile,
@@ -48,6 +48,7 @@ export default function App() {
     const saved = localStorage.getItem(USER_KEY);
     return saved ? JSON.parse(saved) : null;
   });
+  const [authReady, setAuthReady] = useState(!firebaseReady);
 
   const [connections, setConnections] = useState<Connection[]>(() => {
     const saved = localStorage.getItem(CONNECTIONS_KEY);
@@ -82,14 +83,23 @@ export default function App() {
   useEffect(() => {
     if (!firebaseReady || !auth) return;
     return onAuthStateChanged(auth, async user => {
-      if (!user) {
-        setCurrentUser(null);
-        return;
-      }
       try {
-        setCurrentUser(await getFirebaseProfile(user.uid, user.displayName || "SkillSyncer", user.email || ""));
-      } catch (error: any) {
-        setAuthError(error.message);
+        if (!user) {
+          setCurrentUser(null);
+          return;
+        }
+        try {
+          setCurrentUser(await getFirebaseProfile(user.uid, user.displayName || "SkillSyncer", user.email || ""));
+        } catch (error: any) {
+          setAuthError(error.message);
+          setCurrentUser(prev =>
+            prev
+              ? { ...prev, id: user.uid }
+              : defaultProfile(user.uid, user.displayName || "SkillSyncer", user.email || "")
+          );
+        }
+      } finally {
+        setAuthReady(true);
       }
     });
   }, []);
@@ -257,7 +267,7 @@ export default function App() {
     }
   };
 
-  const handleSendMessage = (receiverId: string, text: string) => {
+  const handleSendMessage = (receiverId: string, text: string, imageUrls: string[] = []) => {
     const activeConn = connections.find(
       c =>
         c.status === "accepted" &&
@@ -267,7 +277,7 @@ export default function App() {
 
     if (!activeConn) return;
 
-    sendFirebaseMessage(activeConn.id, currentUser!.id, [activeConn.senderId, activeConn.receiverId], text).catch(error => alert(error.message));
+    sendFirebaseMessage(activeConn.id, currentUser!.id, [activeConn.senderId, activeConn.receiverId], text, imageUrls).catch(error => alert(error.message));
   };
 
   const handleUpdatePlan = (isPremium: boolean) => {
@@ -308,6 +318,14 @@ export default function App() {
 
   if (location.pathname === "/support") {
     return <Support />;
+  }
+
+  if (firebaseReady && !authReady) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-brand-bg">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-brand-border/60 border-t-brand-primary" />
+      </div>
+    );
   }
 
   if (!currentUser) {

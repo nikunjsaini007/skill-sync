@@ -1,16 +1,4 @@
-import {
-  arrayUnion,
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  onSnapshot,
-  query,
-  runTransaction,
-  setDoc,
-  updateDoc,
-  where,
-} from "firebase/firestore";
+import { arrayUnion, collection, deleteDoc, doc, getDoc, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore";
 import type { UpdateData } from "firebase/firestore";
 import { db } from "../../services/firebase";
 import type { CallData, CallStatus } from "../../lib/types";
@@ -115,13 +103,11 @@ export async function transitionCallStatus(
   if (!db) return false;
   const reference = doc(db, CALLS, callId);
   try {
-    await runTransaction(db, async tx => {
-      const snapshot = await tx.get(reference);
-      if (!snapshot.exists()) throw new Error("Call not found");
-      const data = snapshot.data() as CallData;
-      if (data.status !== from) throw new Error("Call status changed");
-      tx.update(reference, { status: to } as unknown as UpdateData<CallData>);
-    });
+    const snapshot = await getDoc(reference);
+    if (!snapshot.exists()) return false;
+    const data = snapshot.data() as CallData;
+    if (data.status !== from) return false;
+    await updateDoc(reference, { status: to } as unknown as UpdateData<CallData>);
     return true;
   } catch (error) {
     console.error("[calls] transitionCallStatus failed:", callId, from, "->", to, error);
@@ -133,17 +119,15 @@ export async function markCallConnected(callId: string): Promise<void> {
   if (!db) return;
   const reference = doc(db, CALLS, callId);
   try {
-    await runTransaction(db, async tx => {
-      const snapshot = await tx.get(reference);
-      if (!snapshot.exists()) return;
-      const data = snapshot.data() as CallData;
-      if (data.status === "ringing" || data.status === "connecting") {
-        tx.update(reference, {
-          status: "connected",
-          connectedAt: Date.now(),
-        } as unknown as UpdateData<CallData>);
-      }
-    });
+    const snapshot = await getDoc(reference);
+    if (!snapshot.exists()) return;
+    const data = snapshot.data() as CallData;
+    if (data.status === "ringing" || data.status === "connecting") {
+      await updateDoc(reference, {
+        status: "connected",
+        connectedAt: Date.now(),
+      } as unknown as UpdateData<CallData>);
+    }
   } catch (error) {
     console.error("[calls] markCallConnected failed:", callId, error);
   }

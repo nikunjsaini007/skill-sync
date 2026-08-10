@@ -5,7 +5,8 @@ export async function sendFirebaseMessage(
   connectionId: string,
   senderId: string,
   participantIds: string[],
-  text: string
+  text: string,
+  imageUrls: string[] = []
 ) {
   if (!db) throw new Error("Firebase is not configured.");
   await addDoc(collection(db, "messages"), {
@@ -13,6 +14,7 @@ export async function sendFirebaseMessage(
     senderId,
     participantIds,
     text,
+    imageUrls,
     createdAt: new Date().toISOString(),
     read: false,
   });

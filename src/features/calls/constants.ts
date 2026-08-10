@@ -3,12 +3,20 @@ import type { CallStatus } from "../../lib/types";
 export const CALLS_COLLECTION = "calls";
 
 export const ICE_SERVERS: RTCConfiguration = {
-  iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+  iceServers: [
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" },
+    { urls: "stun:stun2.l.google.com:19302" },
+    { urls: "stun:stun.cloudflare.com:3478" },
+    { urls: "stun:global.stun.twilio.com:3478" },
+    { urls: "stun:stun.openrelay.metered.ca:80" },
+  ],
 };
 
 export const MISSED_CALL_TIMEOUT_MS = 30_000;
 export const RESTART_DELAY_MS = 2_500;
 export const RECONNECT_GRACE_MS = 12_000;
+export const CONNECTING_WATCHDOG_MS = 20_000;
 export const CLEANUP_DELAY_MS = 1_800;
 
 export const VIDEO_CONSTRAINTS: MediaTrackConstraints = {

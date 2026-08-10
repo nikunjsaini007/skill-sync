@@ -12,6 +12,7 @@ import {
   Star
 } from "lucide-react";
 import { UserProfile } from "@/lib/types";
+import skillsyncLogo from "../../../assets/skillsyncLogo.png";
 
 interface SidebarProps {
   activeTab: string;
@@ -38,16 +39,13 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
       <div className="absolute bottom-24 -left-24 w-64 h-64 rounded-full bg-brand-accent/8 blur-3xl pointer-events-none" />
 
       <div className="space-y-6 relative">
-        <div className="flex items-center space-x-3 px-2 py-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-primary to-brand-accent flex items-center justify-center shadow-[0_10px_25px_rgba(56,189,248,0.25)]">
-            <Sparkles className="w-5 h-5 text-white" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xl font-bold font-display tracking-tight text-white leading-none">
-              SkillSync
-            </span>
-            <span className="text-[10px] text-slate-500 font-mono mt-1">LEARN WITH FRIENDS</span>
-          </div>
+        <div className="flex flex-col items-center gap-1.5 px-2 py-3">
+          <img
+            src={skillsyncLogo}
+            alt="SkillSync"
+            className="h-10 w-auto object-contain drop-shadow-[0_0_14px_rgba(56,189,248,0.3)]"
+          />
+          <span className="text-[10px] text-slate-500 font-mono text-center text-white">LEARN WITH FRIENDS</span>
         </div>
 
        

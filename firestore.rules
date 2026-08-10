@@ -14,6 +14,10 @@ service cloud.firestore {
       return isOwner(callerId) || isOwner(calleeId);
     }
 
+    function canReadCall() {
+      return resource == null || isParticipant(resource.data.callerId, resource.data.calleeId);
+    }
+
     match /users/{userId} {
       allow read: if signedIn();
       allow create: if isOwner(userId);
@@ -37,7 +41,7 @@ service cloud.firestore {
     }
 
     match /calls/{callId} {
-      allow read: if signedIn() && isParticipant(resource.data.callerId, resource.data.calleeId);
+      allow read: if signedIn() && canReadCall();
       allow create: if signedIn() && request.resource.data.callerId == request.auth.uid;
       allow update: if signedIn() && isParticipant(resource.data.callerId, resource.data.calleeId);
       allow delete: if signedIn() && isParticipant(resource.data.callerId, resource.data.calleeId);

@@ -12,6 +12,7 @@ import {
 import { startRingtone } from "./ringtone";
 import {
   CLEANUP_DELAY_MS,
+  CONNECTING_WATCHDOG_MS,
   ICE_SERVERS,
   MISSED_CALL_TIMEOUT_MS,
   RECONNECT_GRACE_MS,
@@ -95,6 +96,37 @@ export function useCall(options: UseCallOptions): UseCallResult {
   const lastOfferRoundRef = useRef(0);
   const lastAnswerRoundRef = useRef(0);
   const restartingRef = useRef(false);
+  const docListenerRetryRef = useRef(0);
+  const candidateBufferRef = useRef<RTCIceCandidateInit[]>([]);
+  const candidateFlushTimerRef = useRef<number | null>(null);
+  const connectingTimerRef = useRef<number | null>(null);
+
+  function flushCandidateBuffer() {
+    candidateFlushTimerRef.current = null;
+    if (candidateBufferRef.current.length === 0) return;
+    const batch = candidateBufferRef.current;
+    candidateBufferRef.current = [];
+    console.log(
+      "[calls] flushing local candidates:",
+      role,
+      "count:",
+      batch.length,
+      "->",
+      role === "caller" ? "callerCandidates" : "calleeCandidates"
+    );
+    void appendCallCandidates(
+      callIdRef.current,
+      role === "caller" ? "callerCandidates" : "calleeCandidates",
+      batch
+    ).catch(error => {
+      console.error("[calls] FAILED to append candidates:", role, error);
+    });
+  }
+
+  function scheduleCandidateFlush() {
+    if (candidateFlushTimerRef.current !== null) return;
+    candidateFlushTimerRef.current = window.setTimeout(flushCandidateBuffer, 250);
+  }
 
   function clearTimers() {
     if (missedTimerRef.current !== null) {
@@ -108,6 +140,14 @@ export function useCall(options: UseCallOptions): UseCallResult {
     if (endGraceTimerRef.current !== null) {
       window.clearTimeout(endGraceTimerRef.current);
       endGraceTimerRef.current = null;
+    }
+    if (candidateFlushTimerRef.current !== null) {
+      window.clearTimeout(candidateFlushTimerRef.current);
+      candidateFlushTimerRef.current = null;
+    }
+    if (connectingTimerRef.current !== null) {
+      window.clearTimeout(connectingTimerRef.current);
+      connectingTimerRef.current = null;
     }
   }
 
@@ -136,6 +176,11 @@ export function useCall(options: UseCallOptions): UseCallResult {
     stopLocalMedia();
   }
 
+  function isTransportConnected(): boolean {
+    const peer = peerRef.current;
+    return peer?.connectionState === "connected" || peer?.iceConnectionState === "connected";
+  }
+
   function scheduleCleanup(delay = CLEANUP_DELAY_MS) {
     if (cleanupScheduledRef.current) return;
     cleanupScheduledRef.current = true;
@@ -160,7 +205,18 @@ export function useCall(options: UseCallOptions): UseCallResult {
 
   function handleDocListenerError(err: unknown) {
     if (endedRef.current) return;
-    const mediaConnected = peerRef.current?.connectionState === "connected";
+    const mediaConnected = isTransportConnected();
+    const code = (err as { code?: string })?.code;
+    if (!mediaConnected && code === "permission-denied" && docListenerRetryRef.current === 0) {
+      docListenerRetryRef.current = 1;
+      console.warn("[calls] doc listener permission-denied, retrying listen:", callIdRef.current);
+      window.setTimeout(() => {
+        if (endedRef.current) return;
+        unsubRef.current?.();
+        unsubRef.current = subscribeCallDoc(callIdRef.current, handleDoc, handleDocListenerError);
+      }, 800);
+      return;
+    }
     console.error(
       "[calls] doc listener error:",
       callIdRef.current,
@@ -280,11 +336,8 @@ export function useCall(options: UseCallOptions): UseCallResult {
         pendingCandidatesRef.current.push(init);
         return;
       }
-      void appendCallCandidates(
-        callIdRef.current,
-        role === "caller" ? "callerCandidates" : "calleeCandidates",
-        [init]
-      ).catch(() => {});
+      candidateBufferRef.current.push(init);
+      scheduleCandidateFlush();
     };
 
     peer.onicecandidateerror = (event: RTCPeerConnectionIceErrorEvent) => {
@@ -293,6 +346,53 @@ export function useCall(options: UseCallOptions): UseCallResult {
 
     peer.oniceconnectionstatechange = () => {
       console.log("[calls] iceConnectionState:", role, peer.iceConnectionState);
+      if (peer.iceConnectionState === "connected") {
+        if (reconnectTimerRef.current !== null) {
+          window.clearTimeout(reconnectTimerRef.current);
+          reconnectTimerRef.current = null;
+        }
+        if (endGraceTimerRef.current !== null) {
+          window.clearTimeout(endGraceTimerRef.current);
+          endGraceTimerRef.current = null;
+        }
+        if (connectingTimerRef.current !== null) {
+          window.clearTimeout(connectingTimerRef.current);
+          connectingTimerRef.current = null;
+        }
+        if (!endedRef.current) {
+          void markCallConnected(callIdRef.current);
+        }
+        void peer
+          .getStats()
+          .then(stats => {
+            stats.forEach(report => {
+              const pair = report as RTCStats & {
+                state?: string;
+                localCandidateId?: string;
+                remoteCandidateId?: string;
+              };
+              if (report.type === "candidate-pair" && pair.state === "succeeded") {
+                const local = stats.get(pair.localCandidateId ?? "") as
+                  | (RTCStats & { candidateType?: string; address?: string })
+                  | undefined;
+                const remote = stats.get(pair.remoteCandidateId ?? "") as
+                  | (RTCStats & { candidateType?: string; address?: string })
+                  | undefined;
+                console.log(
+                  "[calls] selected candidate pair:",
+                  role,
+                  "local:",
+                  local?.candidateType,
+                  local?.address,
+                  "remote:",
+                  remote?.candidateType,
+                  remote?.address
+                );
+              }
+            });
+          })
+          .catch(() => {});
+      }
     };
 
     peer.ontrack = (event: RTCTrackEvent) => {
@@ -312,6 +412,10 @@ export function useCall(options: UseCallOptions): UseCallResult {
         if (endGraceTimerRef.current !== null) {
           window.clearTimeout(endGraceTimerRef.current);
           endGraceTimerRef.current = null;
+        }
+        if (connectingTimerRef.current !== null) {
+          window.clearTimeout(connectingTimerRef.current);
+          connectingTimerRef.current = null;
         }
         void peer
           .getStats()
@@ -350,7 +454,7 @@ export function useCall(options: UseCallOptions): UseCallResult {
           reconnectTimerRef.current = window.setTimeout(() => {
             reconnectTimerRef.current = null;
             if (endedRef.current) return;
-            if (peerRef.current?.connectionState === "connected") return;
+            if (isTransportConnected()) return;
             if (role === "caller") {
               void restartIce();
             }
@@ -360,7 +464,7 @@ export function useCall(options: UseCallOptions): UseCallResult {
                 endGraceTimerRef.current = null;
                 if (
                   !endedRef.current &&
-                  peerRef.current?.connectionState !== "connected"
+                  !isTransportConnected()
                 ) {
                   const message = "The call was disconnected.";
                   setError(message);
@@ -370,11 +474,51 @@ export function useCall(options: UseCallOptions): UseCallResult {
             }
           }, RESTART_DELAY_MS);
         }
+      } else if (peer.connectionState === "connecting") {
+        if (connectingTimerRef.current === null && !endedRef.current) {
+          console.log("[calls] connecting watchdog armed:", role);
+          connectingTimerRef.current = window.setTimeout(() => {
+            connectingTimerRef.current = null;
+            if (endedRef.current) return;
+            if (isTransportConnected()) return;
+            console.log("[calls] connecting watchdog fired:", role);
+            if (role === "caller") {
+              void restartIce();
+            }
+            if (endGraceTimerRef.current === null) {
+              endGraceTimerRef.current = window.setTimeout(() => {
+                endGraceTimerRef.current = null;
+                if (
+                  !endedRef.current &&
+                  !isTransportConnected()
+                ) {
+                  const message = "Connection failed. The call has been disconnected.";
+                  setError(message);
+                  notifyTerminal("failed", message);
+                }
+              }, RECONNECT_GRACE_MS);
+            }
+          }, CONNECTING_WATCHDOG_MS);
+        }
       } else if (peer.connectionState === "failed") {
-        if (!endedRef.current) {
-          const message = "Connection failed. The call has been disconnected.";
-          setError(message);
-          notifyTerminal("failed", message);
+        if (!endedRef.current && !restartingRef.current) {
+          console.log("[calls] connection failed, attempting recovery:", role);
+          if (endGraceTimerRef.current === null) {
+            endGraceTimerRef.current = window.setTimeout(() => {
+              endGraceTimerRef.current = null;
+              if (
+                !endedRef.current &&
+                !isTransportConnected()
+              ) {
+                const message = "Connection failed. The call has been disconnected.";
+                setError(message);
+                notifyTerminal("failed", message);
+              }
+            }, RECONNECT_GRACE_MS);
+          }
+          if (role === "caller") {
+            void restartIce();
+          }
         }
       }
     };
@@ -450,11 +594,27 @@ export function useCall(options: UseCallOptions): UseCallResult {
     for (let index = processed[key]; index < candidates.length; index++) {
       const candidate = candidates[index];
       if (remoteDescSetRef.current) {
-        void peerRef.current?.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {});
+        void peerRef.current?.addIceCandidate(new RTCIceCandidate(candidate)).catch(error => {
+          console.error("[calls] addIceCandidate FAILED:", role, error);
+        });
       } else {
         bufferedCandidatesRef.current.push(candidate);
       }
       processed[key] = index + 1;
+    }
+    if (candidates.length > 0) {
+      console.log(
+        "[calls] drainCandidates:",
+        role,
+        "got:",
+        candidates.length,
+        "processed:",
+        processed[key],
+        "remoteDescSet:",
+        remoteDescSetRef.current,
+        "peerCreated:",
+        Boolean(peerRef.current)
+      );
     }
   }
 
@@ -612,6 +772,7 @@ export function useCall(options: UseCallOptions): UseCallResult {
   async function initCallee() {
     if (initStartedRef.current) return;
     initStartedRef.current = true;
+    docCreatedRef.current = true;
     pendingAcceptRef.current = autoAccept ?? false;
     unsubRef.current = subscribeCallDoc(callIdRef.current, handleDoc, handleDocListenerError);
   }
@@ -627,6 +788,7 @@ export function useCall(options: UseCallOptions): UseCallResult {
       stateRef.current.cancelled = true;
       disposeAll();
       initStartedRef.current = false;
+      docListenerRetryRef.current = 0;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

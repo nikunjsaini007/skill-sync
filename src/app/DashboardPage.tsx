@@ -31,7 +31,7 @@ interface DashboardPageProps {
   onAcceptConnection: (connId: string) => void;
   onRejectConnection: (connId: string) => void;
   onRemoveConnection: (connId: string) => void;
-  onSendMessage: (receiverId: string, text: string) => void;
+  onSendMessage: (receiverId: string, text: string, imageUrls?: string[]) => void;
   onUpdatePlan: (isPremium: boolean) => void;
   onResetData: () => void;
   onLogout: () => void;
@@ -107,6 +107,7 @@ export default function DashboardPage({
         return (
           <DashboardView
             currentUser={currentUser}
+            users={users}
             connections={connections}
             onNavigateTab={setActiveTab}
             onConnectPeer={onConnectPeer}

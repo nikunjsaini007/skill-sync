@@ -291,6 +291,57 @@ ${profileContext}
 });
 
 
+function extractJsonArray(text: string): any[] | null {
+  const cleaned = text.replace(/```json|```/g, "").trim();
+  const start = cleaned.indexOf("[");
+  const end = cleaned.lastIndexOf("]");
+  if (start === -1 || end === -1 || end <= start) return null;
+  try {
+    return JSON.parse(cleaned.slice(start, end + 1));
+  } catch {
+    return null;
+  }
+}
+
+app.post("/api/ai/matches", async (req, res) => {
+  console.log("Syncy matches route hit");
+  try {
+    const { profile, peers } = req.body || {};
+    if (!profile || !Array.isArray(peers) || peers.length === 0) {
+      return res.status(400).json({ error: "Profile and peers are required." });
+    }
+    const groq = getGroq();
+    const profileBlock = `Name: ${profile.name}\nSkills Offered: ${(profile.skillsOffered || []).join(", ")}\nSkills Wanted: ${(profile.skillsWanted || []).join(", ")}\nExperience: ${profile.experience}\nGoals: ${profile.learningGoals}`;
+    const peersBlock = peers.map(p =>
+      `id: ${p.id} | name: ${p.name} | headline: ${p.headline} | teaches: ${(p.skillsOffered || []).join(", ")} | wants: ${(p.skillsWanted || []).join(", ")} | level: ${p.experience}`
+    ).join("\n");
+
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      temperature: 0.4,
+      max_tokens: 700,
+      messages: [
+        {
+          role: "system",
+          content: "You are Syncy, the peer skill-swap matching engine inside SkillSync. You rank candidate peers by how well they complement the user's skills for a mutually beneficial exchange. Be specific and concise."
+        },
+        {
+          role: "user",
+          content: `USER PROFILE:\n${profileBlock}\n\nCANDIDATE PEERS:\n${peersBlock}\n\nRank the top 3 peers best suited for a skill swap with this user. For each, return an object with keys: "id" (the exact peer id), "score" (integer 30-98, how strong the mutual skill-swap fit is), and "reason" (one sentence explaining the concrete skills exchanged between the user and that peer).\nReturn ONLY a valid JSON array of 1-3 objects. No markdown, no extra text.`
+        }
+      ]
+    });
+
+    const text = completion.choices[0]?.message?.content || "";
+    const matches = extractJsonArray(text);
+    if (!matches) return res.status(500).json({ error: "Could not parse Syncy match suggestions." });
+    res.json({ matches: matches.slice(0, 3) });
+  } catch (error: any) {
+    console.error("Syncy matches error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.post("/api/ai/generate-profile", async (req, res) => {
   try {
     const { skillsOffered, skillsWanted, experience, interests, promptType } = req.body;

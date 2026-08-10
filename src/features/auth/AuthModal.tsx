@@ -1,5 +1,6 @@
-import { AlertCircle, Sparkles, X } from "lucide-react";
+import { AlertCircle, X } from "lucide-react";
 import React from "react";
+import skillsyncLogo from "../../../assets/logo.png";
 
 interface AuthModalProps {
   authMode: "login" | "signup" | null;
@@ -42,8 +43,8 @@ export default function AuthModal({
 
         <div className="relative flex flex-col lg:flex-row">
           <div className="w-full border-b border-brand-border/50 bg-brand-bg/30 p-8 lg:w-[42%] lg:border-b-0 lg:border-r lg:p-10">
-            <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-brand-primary to-brand-accent shadow-lg shadow-brand-primary/20">
-              <Sparkles className="h-6 w-6 text-white" />
+            <div className="mb-6 flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-brand-primary/30 bg-brand-bg/60 shadow-lg shadow-brand-primary/20">
+              <img src={skillsyncLogo} alt="SkillSync" className="h-11 w-11 object-contain" />
             </div>
             <h3 className="text-2xl font-bold font-display text-white">
               {authMode === "login" ? "Welcome back to SkillSync" : "Build your SkillSync profile"}
