@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: skill-sync
+    runtime: node
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    autoDeploy: true
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      # Public Firebase config (required at build time so Vite inlines it)
+      - key: VITE_FIREBASE_API_KEY
+        value: AIzaSyAHo6AT8cpFYNBDIg2xBEh9xAZgwxD7GxY
+      - key: VITE_FIREBASE_AUTH_DOMAIN
+        value: skill-sync-985eb.firebaseapp.com
+      - key: VITE_FIREBASE_PROJECT_ID
+        value: skill-sync-985eb
+      - key: VITE_FIREBASE_STORAGE_BUCKET
+        value: skill-sync-985eb.firebasestorage.app
+      - key: VITE_FIREBASE_MESSAGING_SENDER_ID
+        value: 247227622758
+      - key: VITE_FIREBASE_APP_ID
+        value: 1:247227622758:web:48ed6c5138a58bcfe2d4a7
